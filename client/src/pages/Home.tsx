@@ -1,46 +1,44 @@
 /*
- * Design: "Bazaar Fresh" — Warm Marketplace Aesthetic
- * Home page: Hero → Categories → Product Grid → About → Footer
- * Warm cream bg, teal & terracotta accents, Outfit + Source Sans 3 fonts
- * Mobile-first, Telegram Mini App compatible
+ * Design: "Bazaar Fresh" — Warm Marketplace
+ * Home page: All sections assembled with bilingual support
  */
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { PRODUCTS, Product } from "@/lib/products";
-import { initTelegramWebApp } from "@/lib/telegram";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CategoryFilter from "@/components/CategoryFilter";
 import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
+import TelegramFloatingButton from "@/components/TelegramFloatingButton";
+import ContactSection from "@/components/ContactSection";
+import TelegramMiniAppSection from "@/components/TelegramMiniAppSection";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
-import TelegramFloatingButton from "@/components/TelegramFloatingButton";
-import { motion } from "framer-motion";
 import { Search, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
+  const { language, t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Initialize Telegram WebApp if running inside Telegram
-  useEffect(() => {
-    initTelegramWebApp();
-  }, []);
-
-  // Filter products by category and search
   const filteredProducts = useMemo(() => {
     return PRODUCTS.filter((p) => {
-      const matchesCategory =
-        activeCategory === "all" || p.category === activeCategory;
+      const matchesCategory = activeCategory === "all" || p.category === activeCategory;
+      if (!searchQuery.trim()) return matchesCategory;
+      const query = searchQuery.toLowerCase();
+      const name = language === "kh" ? p.name_kh : p.name;
+      const desc = language === "kh" ? p.description_kh : p.description;
       const matchesSearch =
-        !searchQuery ||
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchQuery.toLowerCase());
+        name.toLowerCase().includes(query) ||
+        desc.toLowerCase().includes(query) ||
+        p.name.toLowerCase().includes(query); // always search English too
       return matchesCategory && matchesSearch;
     });
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, language]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -48,62 +46,61 @@ export default function Home() {
       <HeroSection />
 
       {/* Products Section */}
-      <section id="products" className="py-12 md:py-20">
+      <section id="products" className="py-16 md:py-24">
         <div className="container">
           {/* Section Header */}
-          <div className="mb-8">
+          <div className="text-center mb-10">
             <motion.span
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="inline-block px-3 py-1 bg-terracotta/10 text-terracotta text-xs font-semibold rounded-full mb-4 uppercase tracking-wide"
+              className="inline-block px-3 py-1 bg-teal/10 text-teal text-xs font-semibold rounded-full mb-4 uppercase tracking-wide"
             >
-              Our Collection
+              {t.products_badge}
             </motion.span>
             <motion.h2
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="font-display font-bold text-3xl md:text-4xl text-walnut mb-2"
+              className="font-display font-bold text-3xl md:text-4xl text-walnut mb-3"
             >
-              Featured Products
+              {t.products_title}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="text-walnut-light text-base"
+              className="text-walnut-light text-base max-w-md mx-auto"
             >
-              Tap any product to see details, or inquire directly via Telegram.
+              {t.products_subtitle}
             </motion.p>
           </div>
 
-          {/* Search + Category Filters */}
-          <div className="flex flex-col gap-4 mb-8">
-            {/* Search bar */}
-            <div className="relative max-w-md">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-walnut-light" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 bg-white border border-border rounded-xl text-sm text-walnut placeholder:text-walnut-light/50 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-walnut-light hover:text-walnut"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
+          {/* Search */}
+          <div className="relative max-w-md mx-auto mb-6">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-walnut-light" />
+            <input
+              type="text"
+              placeholder={t.products_search}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-2.5 bg-white border border-border rounded-xl text-sm text-walnut placeholder:text-walnut-light/60 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-walnut-light hover:text-walnut"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
-            {/* Category filter pills */}
+          {/* Category Filter */}
+          <div className="mb-8 flex justify-center">
             <CategoryFilter
               activeCategory={activeCategory}
               onCategoryChange={setActiveCategory}
@@ -111,44 +108,69 @@ export default function Home() {
           </div>
 
           {/* Product Grid */}
-          {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {filteredProducts.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  index={index}
-                  onViewDetails={setSelectedProduct}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 mx-auto mb-4 bg-cream-dark rounded-2xl flex items-center justify-center">
-                <Search className="w-7 h-7 text-walnut-light" />
-              </div>
-              <h3 className="font-display font-semibold text-lg text-walnut mb-2">
-                No products found
-              </h3>
-              <p className="text-walnut-light text-sm">
-                Try adjusting your search or category filter.
-              </p>
-              <button
-                onClick={() => {
-                  setSearchQuery("");
-                  setActiveCategory("all");
-                }}
-                className="mt-4 px-4 py-2 bg-teal/10 text-teal rounded-lg text-sm font-medium hover:bg-teal hover:text-white transition-colors"
+          <AnimatePresence mode="wait">
+            {filteredProducts.length > 0 ? (
+              <motion.div
+                key={`${activeCategory}-${searchQuery}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
               >
-                Clear Filters
-              </button>
-            </div>
-          )}
+                {filteredProducts.map((product, i) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    index={i}
+                    onViewDetails={setSelectedProduct}
+                  />
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-center py-16"
+              >
+                <div className="w-16 h-16 mx-auto mb-4 bg-cream-dark rounded-2xl flex items-center justify-center">
+                  <Search className="w-7 h-7 text-walnut-light/50" />
+                </div>
+                <h3 className="font-display font-semibold text-lg text-walnut mb-2">
+                  {t.products_no_results}
+                </h3>
+                <p className="text-walnut-light text-sm mb-4">
+                  {t.products_no_results_desc}
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setActiveCategory("all");
+                  }}
+                  className="px-4 py-2 bg-teal/10 text-teal rounded-lg text-sm font-medium hover:bg-teal/20 transition-colors"
+                >
+                  {t.products_clear_filters}
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </section>
 
+      {/* Telegram Mini App Section */}
+      <TelegramMiniAppSection />
+
+      {/* Contact Section */}
+      <ContactSection />
+
+      {/* About / How It Works */}
       <AboutSection />
+
+      {/* Footer */}
       <Footer />
+
+      {/* Floating Telegram Button */}
       <TelegramFloatingButton />
 
       {/* Product Detail Modal */}

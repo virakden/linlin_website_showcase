@@ -1,0 +1,10 @@
+Website V2 Review Notes:
+
+1. Hero Section: Perfect - same warm marketplace banner, language switcher visible in navbar as "ភាសាខ្មែរ"
+2. Navbar: Updated with Products, Contact, Mini App, About links + language switcher + Message Us CTA
+3. Products: 7 products displayed in grid (4 cols desktop), each with hover overlay showing View/Video/Telegram buttons
+4. Telegram Mini App Section: Beautiful blue gradient with phone mockup, "Open Mini App" and "Join Our Channel" buttons
+5. Contact Section: Starting to show with "Get In Touch" / "Contact Us" header and social link cards beginning
+6. Need to scroll more to see: Contact cards fully, About section, Footer
+
+All sections loading correctly. No TypeScript errors. No visual bugs detected.

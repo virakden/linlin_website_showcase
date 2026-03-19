@@ -1,10 +1,10 @@
 /*
  * Design: "Bazaar Fresh" — Warm Marketplace
- * Hero: Full-width banner with marketplace imagery, warm overlay, CTA buttons
- * Dark image background → white/light text for contrast
+ * Hero: Full-width banner, dark overlay → white text, bilingual
  */
 
 import { STORE_CONFIG } from "@/lib/products";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { openTelegramChat } from "@/lib/telegram";
 import { ArrowDown, Send } from "lucide-react";
 import { motion } from "framer-motion";
@@ -13,23 +13,22 @@ const HERO_IMAGE =
   "https://d2xsxph8kpxj0f.cloudfront.net/94881429/4KB6uyCU5k4C5PL8SYBrx7/hero-banner-mo33C5EoW4CpAVHzyJKKut.webp";
 
 export default function HeroSection() {
+  const { language, t } = useLanguage();
+
+  const title = language === "kh" ? STORE_CONFIG.tagline_kh : STORE_CONFIG.tagline;
+  const desc = language === "kh" ? STORE_CONFIG.description_kh : STORE_CONFIG.description;
+
   const scrollToProducts = () => {
     document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <section id="hero" className="relative overflow-hidden">
-      {/* Background Image with Overlay */}
       <div className="absolute inset-0">
-        <img
-          src={HERO_IMAGE}
-          alt="Marketplace"
-          className="w-full h-full object-cover"
-        />
+        <img src={HERO_IMAGE} alt="Marketplace" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-walnut/85 via-walnut/60 to-walnut/40" />
       </div>
 
-      {/* Content */}
       <div className="relative container py-24 md:py-36 lg:py-44">
         <div className="max-w-xl">
           <motion.div
@@ -38,7 +37,7 @@ export default function HeroSection() {
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
             <span className="inline-block px-3 py-1 bg-terracotta/90 text-white text-xs font-semibold rounded-full mb-6 tracking-wide uppercase">
-              Shop with Confidence
+              {t.hero_badge}
             </span>
           </motion.div>
 
@@ -48,7 +47,7 @@ export default function HeroSection() {
             transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
             className="font-display font-extrabold text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-5"
           >
-            {STORE_CONFIG.tagline}
+            {title}
           </motion.h1>
 
           <motion.p
@@ -57,7 +56,7 @@ export default function HeroSection() {
             transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
             className="text-cream/90 text-lg md:text-xl leading-relaxed mb-8 max-w-md"
           >
-            {STORE_CONFIG.description}
+            {desc}
           </motion.p>
 
           <motion.div
@@ -70,7 +69,7 @@ export default function HeroSection() {
               onClick={scrollToProducts}
               className="flex items-center gap-2 px-6 py-3 bg-white text-walnut rounded-xl font-semibold text-sm hover:bg-cream transition-colors shadow-lg hover:shadow-xl"
             >
-              Browse Products
+              {t.hero_browse}
               <ArrowDown className="w-4 h-4" />
             </button>
             <button
@@ -83,25 +82,15 @@ export default function HeroSection() {
               className="flex items-center gap-2 px-6 py-3 bg-teal text-white rounded-xl font-semibold text-sm hover:bg-teal-dark transition-colors shadow-lg hover:shadow-xl"
             >
               <Send className="w-4 h-4" />
-              Chat on Telegram
+              {t.hero_chat_telegram}
             </button>
           </motion.div>
         </div>
       </div>
 
-      {/* Bottom wave divider */}
       <div className="absolute bottom-0 left-0 right-0">
-        <svg
-          viewBox="0 0 1440 80"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-auto block"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M0 40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0V40Z"
-            className="fill-background"
-          />
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block" preserveAspectRatio="none">
+          <path d="M0 40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0V40Z" className="fill-background" />
         </svg>
       </div>
     </section>

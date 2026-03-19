@@ -1,0 +1,212 @@
+/*
+ * Design: "Bazaar Fresh" — Warm Marketplace
+ * Contact section: All social links (Telegram, Facebook, TikTok, Instagram)
+ * Direct contact via Telegram & Facebook only
+ */
+
+import { STORE_CONFIG } from "@/lib/products";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { openTelegramChat } from "@/lib/telegram";
+import { Send, ExternalLink, MessageCircle } from "lucide-react";
+import { motion } from "framer-motion";
+
+// Telegram SVG icon
+function TelegramIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+    </svg>
+  );
+}
+
+// Facebook SVG icon
+function FacebookIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
+
+// TikTok SVG icon
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
+    </svg>
+  );
+}
+
+// Instagram SVG icon
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+    </svg>
+  );
+}
+
+const SOCIAL_LINKS = [
+  {
+    id: "telegram",
+    icon: TelegramIcon,
+    color: "bg-[#2AABEE]",
+    hoverColor: "hover:bg-[#229ED9]",
+    getTitle: (t: any) => t.contact_telegram_title,
+    getDesc: (t: any) => t.contact_telegram_desc,
+    getUrl: () => `https://t.me/${STORE_CONFIG.telegramUsername}`,
+    canContact: true,
+  },
+  {
+    id: "facebook",
+    icon: FacebookIcon,
+    color: "bg-[#1877F2]",
+    hoverColor: "hover:bg-[#166FE5]",
+    getTitle: (t: any) => t.contact_facebook_title,
+    getDesc: (t: any) => t.contact_facebook_desc,
+    getUrl: () => STORE_CONFIG.facebookPage,
+    canContact: true,
+  },
+  {
+    id: "tiktok",
+    icon: TikTokIcon,
+    color: "bg-[#000000]",
+    hoverColor: "hover:bg-[#1a1a1a]",
+    getTitle: (t: any) => t.contact_tiktok_title,
+    getDesc: (t: any) => t.contact_tiktok_desc,
+    getUrl: () => STORE_CONFIG.tiktok,
+    canContact: false,
+  },
+  {
+    id: "instagram",
+    icon: InstagramIcon,
+    color: "bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF]",
+    hoverColor: "hover:opacity-90",
+    getTitle: (t: any) => t.contact_instagram_title,
+    getDesc: (t: any) => t.contact_instagram_desc,
+    getUrl: () => STORE_CONFIG.instagram,
+    canContact: false,
+  },
+];
+
+export default function ContactSection() {
+  const { t } = useLanguage();
+
+  return (
+    <section id="contact" className="py-16 md:py-24 bg-cream-dark">
+      <div className="container">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <motion.span
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="inline-block px-3 py-1 bg-teal/10 text-teal text-xs font-semibold rounded-full mb-4 uppercase tracking-wide"
+          >
+            {t.contact_badge}
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="font-display font-bold text-3xl md:text-4xl text-walnut mb-4"
+          >
+            {t.contact_title}
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="text-walnut-light text-lg max-w-md mx-auto"
+          >
+            {t.contact_subtitle}
+          </motion.p>
+        </div>
+
+        {/* Social Links Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          {SOCIAL_LINKS.map((social, i) => {
+            const Icon = social.icon;
+            return (
+              <motion.a
+                key={social.id}
+                href={social.getUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="bg-white rounded-2xl p-5 text-center group hover:shadow-lg transition-all duration-300 border border-border/40"
+              >
+                <div className={`w-12 h-12 mx-auto mb-3 ${social.color} rounded-xl flex items-center justify-center ${social.hoverColor} transition-all`}>
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-display font-semibold text-sm text-walnut mb-1">
+                  {social.getTitle(t)}
+                </h3>
+                <p className="text-xs text-walnut-light leading-relaxed">
+                  {social.getDesc(t)}
+                </p>
+                <div className="mt-3 flex items-center justify-center gap-1 text-xs text-teal font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ExternalLink className="w-3 h-3" />
+                  <span>Open</span>
+                </div>
+              </motion.a>
+            );
+          })}
+        </div>
+
+        {/* Direct Contact CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="bg-white rounded-2xl p-6 md:p-8 border border-border/40 shadow-sm"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-terracotta/10 rounded-xl flex items-center justify-center">
+              <MessageCircle className="w-5 h-5 text-terracotta" />
+            </div>
+            <div>
+              <h3 className="font-display font-bold text-lg text-walnut">
+                {t.contact_direct_title}
+              </h3>
+              <p className="text-sm text-walnut-light">
+                {t.contact_direct_desc}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() =>
+                openTelegramChat(
+                  STORE_CONFIG.telegramUsername,
+                  "Hi! I'd like to place an order."
+                )
+              }
+              className="flex-1 flex items-center justify-center gap-2.5 px-5 py-3 bg-[#2AABEE] text-white rounded-xl font-semibold text-sm hover:bg-[#229ED9] transition-colors shadow-md"
+            >
+              <TelegramIcon className="w-5 h-5" />
+              {t.contact_message_telegram}
+            </button>
+            <a
+              href={STORE_CONFIG.facebookPage}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2.5 px-5 py-3 bg-[#1877F2] text-white rounded-xl font-semibold text-sm hover:bg-[#166FE5] transition-colors shadow-md"
+            >
+              <FacebookIcon className="w-5 h-5" />
+              {t.contact_message_facebook}
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}

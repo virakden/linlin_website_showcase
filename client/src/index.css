@@ -54,6 +54,7 @@
 
   --font-display: "Outfit", sans-serif;
   --font-body: "Source Sans 3", sans-serif;
+  --font-khmer: "Noto Sans Khmer", sans-serif;
 }
 
 :root {
@@ -102,6 +103,16 @@
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+  }
+  /* Khmer language support */
+  html[lang="km"] body,
+  html[lang="km"] h1,
+  html[lang="km"] h2,
+  html[lang="km"] h3,
+  html[lang="km"] h4,
+  html[lang="km"] h5,
+  html[lang="km"] h6 {
+    font-family: var(--font-khmer);
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
