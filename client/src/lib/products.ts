@@ -39,6 +39,8 @@ export const CATEGORIES: Category[] = [
   { id: "fashion", name: "Fashion", name_kh: "ម៉ូដ", icon: "Shirt" },
   { id: "home", name: "Home & Living", name_kh: "ផ្ទះ និងការរស់នៅ", icon: "Home" },
   { id: "beauty", name: "Beauty", name_kh: "សម្រស់", icon: "Sparkles" },
+  { id: "food", name: "Food & Drinks", name_kh: "អាហារ និងភេសជ្ជៈ", icon: "Coffee" },
+  { id: "accessories", name: "Accessories", name_kh: "គ្រឿងបន្ថែម", icon: "Watch" },
 ];
 
 export const PRODUCTS: Product[] = [

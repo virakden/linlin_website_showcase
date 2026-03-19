@@ -1,11 +1,11 @@
 /*
  * Design: "Bazaar Fresh" — Warm Marketplace
- * Category pills with bilingual labels
+ * Category pills with bilingual labels — 7 categories
  */
 
 import { CATEGORIES } from "@/lib/products";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { LayoutGrid, Headphones, Shirt, Home, Sparkles } from "lucide-react";
+import { LayoutGrid, Headphones, Shirt, Home, Sparkles, Coffee, Watch } from "lucide-react";
 import { motion } from "framer-motion";
 
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -14,6 +14,8 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Shirt: <Shirt className="w-4 h-4" />,
   Home: <Home className="w-4 h-4" />,
   Sparkles: <Sparkles className="w-4 h-4" />,
+  Coffee: <Coffee className="w-4 h-4" />,
+  Watch: <Watch className="w-4 h-4" />,
 };
 
 interface CategoryFilterProps {
