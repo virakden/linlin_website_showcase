@@ -5,17 +5,25 @@
 
 import { CATEGORIES } from "@/lib/products";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { LayoutGrid, Headphones, Shirt, Home, Sparkles, Coffee, Watch } from "lucide-react";
+import {
+  LayoutGrid,
+  Milk,
+  Amphora,
+  Drama,
+  Egg,
+  Salad,
+  Refrigerator,
+} from "lucide-react";
 import { motion } from "framer-motion";
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   LayoutGrid: <LayoutGrid className="w-4 h-4" />,
-  Headphones: <Headphones className="w-4 h-4" />,
-  Shirt: <Shirt className="w-4 h-4" />,
-  Home: <Home className="w-4 h-4" />,
-  Sparkles: <Sparkles className="w-4 h-4" />,
-  Coffee: <Coffee className="w-4 h-4" />,
-  Watch: <Watch className="w-4 h-4" />,
+  Milk: <Milk className="w-4 h-4" />,
+  Amphora: <Amphora className="w-4 h-4" />,
+  Drama: <Drama className="w-4 h-4" />,
+  Egg: <Egg className="w-4 h-4" />,
+  Salad: <Salad className="w-4 h-4" />,
+  Refrigerator: <Refrigerator className="w-4 h-4" />,
 };
 
 interface CategoryFilterProps {
@@ -23,12 +31,18 @@ interface CategoryFilterProps {
   onCategoryChange: (categoryId: string) => void;
 }
 
-export default function CategoryFilter({ activeCategory, onCategoryChange }: CategoryFilterProps) {
+export default function CategoryFilter({
+  activeCategory,
+  onCategoryChange,
+}: CategoryFilterProps) {
   const { language } = useLanguage();
 
   return (
-    <div id="categories" className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-      {CATEGORIES.map((cat) => {
+    <div
+      id="categories"
+      className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
+    >
+      {CATEGORIES.map(cat => {
         const isActive = activeCategory === cat.id;
         const label = language === "kh" ? cat.name_kh : cat.name;
         return (
