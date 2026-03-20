@@ -33,8 +33,8 @@ export const STORE_CONFIG = {
   telegramUsername: "linlin_skincare_bot",
   telegramChannel: "https://t.me/linlin_skincare", // Your Telegram channel
   telegramMiniApp: "https://t.me/linlin_skincare_bot/shop", // Mini App link (set later)
-  facebookPage: "https://facebook.com/linlinskincare", // Your Facebook page
-  tiktok: "https://tiktok.com/@linlinskincare", // Your TikTok
+  facebookPage: "https://www.facebook.com/svdlin/", // Your Facebook page
+  tiktok: "https://vt.tiktok.com/ZS9RPEWnVeRJJ-YFzog/", // Your TikTok
   instagram: "https://instagram.com/linlinskincare", // Your Instagram
 
   // Contact
