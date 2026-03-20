@@ -9,7 +9,8 @@ import { ShoppingBag } from "lucide-react";
 
 export default function Footer() {
   const { language, t } = useLanguage();
-  const storeName = language === "kh" ? STORE_CONFIG.name_kh : STORE_CONFIG.name;
+  const storeName =
+    language === "kh" ? STORE_CONFIG.name_kh : STORE_CONFIG.name;
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -21,15 +22,22 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-teal flex items-center justify-center">
+            {/* <div className="w-9 h-9 rounded-xl bg-teal flex items-center justify-center">
               <ShoppingBag className="w-5 h-5 text-white" />
-            </div>
+            </div> */}
+            <img
+              src="/logo.png"
+              alt="LinLin Logo"
+              className="w-16 h-16 rounded-xl object-cover shadow-sm group-hover:shadow-md transition-shadow"
+            />
             <div>
               <span className="font-display font-bold text-white text-base">
                 {storeName}
               </span>
               <p className="text-xs text-cream/50">
-                {language === "kh" ? STORE_CONFIG.tagline_kh : STORE_CONFIG.tagline}
+                {language === "kh"
+                  ? STORE_CONFIG.tagline_kh
+                  : STORE_CONFIG.tagline}
               </p>
             </div>
           </div>

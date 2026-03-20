@@ -15,7 +15,8 @@ export default function Navbar() {
   const { language, t, toggleLanguage } = useLanguage();
   const isTg = isTelegramWebApp();
 
-  const storeName = language === "kh" ? STORE_CONFIG.name_kh : STORE_CONFIG.name;
+  const storeName =
+    language === "kh" ? STORE_CONFIG.name_kh : STORE_CONFIG.name;
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -30,9 +31,14 @@ export default function Navbar() {
           onClick={() => scrollTo("hero")}
           className="flex items-center gap-2.5 group"
         >
-          <div className="w-9 h-9 rounded-xl bg-teal flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+          {/* <div className="w-9 h-9 rounded-xl bg-teal flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
             <ShoppingBag className="w-5 h-5 text-white" />
-          </div>
+          </div> */}
+          <img
+            src="/logo.png"
+            alt="LinLin Logo"
+            className="w-12 h-12 rounded-xl object-cover shadow-sm group-hover:shadow-md transition-shadow"
+          />
           <span className="font-display font-bold text-lg text-walnut tracking-tight">
             {storeName}
           </span>
@@ -104,7 +110,11 @@ export default function Navbar() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-walnut"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </button>
         </div>
       </div>

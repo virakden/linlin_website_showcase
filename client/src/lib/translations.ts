@@ -113,14 +113,16 @@ export const translations: Record<Language, Translations> = {
     // Hero
     hero_badge: "Shop with Confidence",
     hero_title: "Discover Products You'll Love",
-    hero_description: "Browse our curated collection and message us on Telegram to order. Fast replies, easy shopping.",
+    hero_description:
+      "Browse our curated collection and message us on Telegram to order. Fast replies, easy shopping.",
     hero_browse: "Browse Products",
     hero_chat_telegram: "Chat on Telegram",
 
     // Products Section
     products_badge: "Our Collection",
     products_title: "Featured Products",
-    products_subtitle: "Tap any product to see details, or inquire directly via Telegram.",
+    products_subtitle:
+      "Tap any product to see details, or inquire directly via Telegram.",
     products_search: "Search products...",
     products_no_results: "No products found",
     products_no_results_desc: "Try adjusting your search or category filter.",
@@ -143,28 +145,35 @@ export const translations: Record<Language, Translations> = {
     detail_out_of_stock: "Out of Stock",
     detail_product_details: "Product Details",
     detail_ask_product: "Ask About This Product",
-    detail_opens_telegram: "Opens a chat on Telegram with product details pre-filled",
+    detail_opens_telegram:
+      "Opens a chat on Telegram with product details pre-filled",
     detail_watch_video: "Watch Video",
     detail_watch_on: "Watch on",
 
     // About / How It Works
     about_badge: "How It Works",
     about_title: "Shopping Made Simple",
-    about_subtitle: "No complicated checkout. Just browse, ask, and we'll handle the rest.",
+    about_subtitle:
+      "No complicated checkout. Just browse, ask, and we'll handle the rest.",
     about_step1_title: "Browse Products",
-    about_step1_desc: "Explore our curated collection of quality products across multiple categories.",
+    about_step1_desc:
+      "Explore our curated collection of quality products across multiple categories.",
     about_step2_title: "Ask on Telegram",
-    about_step2_desc: "Tap the inquiry button on any product to message us directly with details pre-filled.",
+    about_step2_desc:
+      "Tap the inquiry button on any product to message us directly with details pre-filled.",
     about_step3_title: "Get Your Order",
-    about_step3_desc: "We'll confirm availability, arrange payment, and ship your order quickly.",
+    about_step3_desc:
+      "We'll confirm availability, arrange payment, and ship your order quickly.",
     about_cta_title: "Ready to Order?",
-    about_cta_desc: "Send us a message on Telegram and we'll get back to you within minutes.",
+    about_cta_desc:
+      "Send us a message on Telegram and we'll get back to you within minutes.",
     about_cta_button: "Message Us Now",
 
     // Contact Section
     contact_badge: "Get In Touch",
     contact_title: "Contact Us",
-    contact_subtitle: "Reach out through any of our channels. We're here to help!",
+    contact_subtitle:
+      "Reach out through any of our channels. We're here to help!",
     contact_telegram_title: "Telegram",
     contact_telegram_desc: "Message us directly for orders and inquiries",
     contact_facebook_title: "Facebook Page",
@@ -174,14 +183,16 @@ export const translations: Record<Language, Translations> = {
     contact_instagram_title: "Instagram",
     contact_instagram_desc: "See our latest products and stories",
     contact_direct_title: "Direct Contact",
-    contact_direct_desc: "For orders and business inquiries, contact us directly through:",
+    contact_direct_desc:
+      "For orders and business inquiries, contact us directly through:",
     contact_message_telegram: "Message on Telegram",
     contact_message_facebook: "Message on Facebook",
 
     // Mini App Section
     miniapp_badge: "Telegram Mini App",
     miniapp_title: "Order Directly in Telegram",
-    miniapp_subtitle: "Use our Mini App inside Telegram for the fastest ordering experience. Browse, order, and track — all without leaving Telegram.",
+    miniapp_subtitle:
+      "Use our Mini App inside Telegram for the fastest ordering experience. Browse, order, and track — all without leaving Telegram.",
     miniapp_open_button: "Open Mini App",
     miniapp_join_channel: "Join Our Channel",
     miniapp_feature1: "Browse & order products instantly",
@@ -208,14 +219,16 @@ export const translations: Record<Language, Translations> = {
     // Hero
     hero_badge: "ទិញទំនិញដោយទំនុកចិត្ត",
     hero_title: "រកឃើញផលិតផលដែលអ្នកចូលចិត្ត",
-    hero_description: "រកមើលផលិតផលរបស់យើង ហើយផ្ញើសារមកយើងតាម Telegram ដើម្បីបញ្ជាទិញ។ ឆ្លើយតបរហ័ស ទិញទំនិញងាយស្រួល។",
+    hero_description:
+      "រកមើលផលិតផលរបស់យើង ហើយផ្ញើសារមកយើងតាម Telegram ដើម្បីបញ្ជាទិញ។ ឆ្លើយតបរហ័ស ទិញទំនិញងាយស្រួល។",
     hero_browse: "រកមើលផលិតផល",
     hero_chat_telegram: "ជជែកតាម Telegram",
 
     // Products Section
     products_badge: "បណ្តុំផលិតផល",
     products_title: "ផលិតផលពិសេស",
-    products_subtitle: "ចុចលើផលិតផលណាមួយដើម្បីមើលព័ត៌មានលម្អិត ឬសាកសួរតាម Telegram។",
+    products_subtitle:
+      "ចុចលើផលិតផលណាមួយដើម្បីមើលព័ត៌មានលម្អិត ឬសាកសួរតាម Telegram។",
     products_search: "ស្វែងរកផលិតផល...",
     products_no_results: "រកមិនឃើញផលិតផល",
     products_no_results_desc: "សាកល្បងកែប្រែការស្វែងរក ឬតម្រងប្រភេទ។",
@@ -245,15 +258,18 @@ export const translations: Record<Language, Translations> = {
     // About / How It Works
     about_badge: "របៀបដំណើរការ",
     about_title: "ទិញទំនិញងាយស្រួល",
-    about_subtitle: "គ្មានការបង់ប្រាក់ស្មុគស្មាញ។ គ្រាន់តែរកមើល សាកសួរ ហើយយើងនឹងដោះស្រាយនៅសល់។",
+    about_subtitle:
+      "គ្មានការបង់ប្រាក់ស្មុគស្មាញ។ គ្រាន់តែរកមើល សាកសួរ ហើយយើងនឹងដោះស្រាយនៅសល់។",
     about_step1_title: "រកមើលផលិតផល",
     about_step1_desc: "រកមើលបណ្តុំផលិតផលដែលមានគុណភាពក្នុងប្រភេទផ្សេងៗ។",
     about_step2_title: "សាកសួរតាម Telegram",
     about_step2_desc: "ចុចប៊ូតុងសាកសួរលើផលិតផលណាមួយដើម្បីផ្ញើសារមកយើង។",
     about_step3_title: "ទទួលការបញ្ជាទិញ",
-    about_step3_desc: "យើងនឹងបញ្ជាក់ភាពអាចរកបាន រៀបចំការបង់ប្រាក់ និងដឹកជញ្ជូនយ៉ាងរហ័ស។",
+    about_step3_desc:
+      "យើងនឹងបញ្ជាក់ភាពអាចរកបាន រៀបចំការបង់ប្រាក់ និងដឹកជញ្ជូនយ៉ាងរហ័ស។",
     about_cta_title: "ត្រៀមខ្លួនបញ្ជាទិញ?",
-    about_cta_desc: "ផ្ញើសារមកយើងតាម Telegram ហើយយើងនឹងឆ្លើយតបក្នុងរយៈពេលប៉ុន្មាននាទី។",
+    about_cta_desc:
+      "ផ្ញើសារមកយើងតាម Telegram ហើយយើងនឹងឆ្លើយតបក្នុងរយៈពេលប៉ុន្មាននាទី។",
     about_cta_button: "ផ្ញើសារឥឡូវនេះ",
 
     // Contact Section
@@ -269,14 +285,16 @@ export const translations: Record<Language, Translations> = {
     contact_instagram_title: "Instagram",
     contact_instagram_desc: "មើលផលិតផលថ្មីៗ និងរឿងរ៉ាវ",
     contact_direct_title: "ទំនាក់ទំនងផ្ទាល់",
-    contact_direct_desc: "សម្រាប់ការបញ្ជាទិញ និងសំណួរអាជីវកម្ម សូមទាក់ទងយើងតាម:",
+    contact_direct_desc:
+      "សម្រាប់ការបញ្ជាទិញ និងសំណួរអាជីវកម្ម សូមទាក់ទងយើងតាម:",
     contact_message_telegram: "ផ្ញើសារតាម Telegram",
     contact_message_facebook: "ផ្ញើសារតាម Facebook",
 
     // Mini App Section
     miniapp_badge: "Telegram Mini App",
     miniapp_title: "បញ្ជាទិញផ្ទាល់ក្នុង Telegram",
-    miniapp_subtitle: "ប្រើ Mini App របស់យើងក្នុង Telegram សម្រាប់បទពិសោធន៍បញ្ជាទិញលឿនបំផុត។ រកមើល បញ្ជាទិញ និងតាមដាន — ទាំងអស់ដោយមិនចាកចេញពី Telegram។",
+    miniapp_subtitle:
+      "ប្រើ Mini App របស់យើងក្នុង Telegram សម្រាប់បទពិសោធន៍បញ្ជាទិញលឿនបំផុត។ រកមើល បញ្ជាទិញ និងតាមដាន — ទាំងអស់ដោយមិនចាកចេញពី Telegram។",
     miniapp_open_button: "បើក Mini App",
     miniapp_join_channel: "ចូលរួមឆានែលរបស់យើង",
     miniapp_feature1: "រកមើល និងបញ្ជាទិញផលិតផលភ្លាមៗ",

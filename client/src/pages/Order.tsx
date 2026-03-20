@@ -22,6 +22,7 @@ import {
   CheckCircle,
   X,
   Loader2,
+  Truck,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { Link } from "wouter";
@@ -40,9 +41,116 @@ interface CartItem {
 interface OrderFormData {
   name: string;
   phone: string;
+  province: string;
   address: string;
   note: string;
 }
+
+// Cambodia provinces (25 provinces + capital)
+const CAMBODIA_PROVINCES = [
+  { id: "phnom_penh", name: "Phnom Penh", name_kh: "ភ្នំពេញ", isCapital: true },
+  {
+    id: "banteay_meanchey",
+    name: "Banteay Meanchey",
+    name_kh: "បន្ទាយមានជ័យ",
+    isCapital: false,
+  },
+  {
+    id: "battambang",
+    name: "Battambang",
+    name_kh: "បាត់ដំបង",
+    isCapital: false,
+  },
+  {
+    id: "kampong_cham",
+    name: "Kampong Cham",
+    name_kh: "កំពង់ចាម",
+    isCapital: false,
+  },
+  {
+    id: "kampong_chhnang",
+    name: "Kampong Chhnang",
+    name_kh: "កំពង់ឆ្នាំង",
+    isCapital: false,
+  },
+  {
+    id: "kampong_speu",
+    name: "Kampong Speu",
+    name_kh: "កំពង់ស្ពឺ",
+    isCapital: false,
+  },
+  {
+    id: "kampong_thom",
+    name: "Kampong Thom",
+    name_kh: "កំពង់ធំ",
+    isCapital: false,
+  },
+  { id: "kampot", name: "Kampot", name_kh: "កំពត", isCapital: false },
+  { id: "kandal", name: "Kandal", name_kh: "កណ្ដាល", isCapital: false },
+  { id: "kep", name: "Kep", name_kh: "កែប", isCapital: false },
+  { id: "koh_kong", name: "Koh Kong", name_kh: "កោះកុង", isCapital: false },
+  { id: "kratie", name: "Kratié", name_kh: "ក្រចេះ", isCapital: false },
+  {
+    id: "mondulkiri",
+    name: "Mondulkiri",
+    name_kh: "មណ្ឌលគិរី",
+    isCapital: false,
+  },
+  {
+    id: "oddar_meanchey",
+    name: "Oddar Meanchey",
+    name_kh: "ឧត្តរមានជ័យ",
+    isCapital: false,
+  },
+  { id: "pailin", name: "Pailin", name_kh: "ប៉ៃលិន", isCapital: false },
+  {
+    id: "preah_sihanouk",
+    name: "Preah Sihanouk",
+    name_kh: "ព្រះសីហនុ",
+    isCapital: false,
+  },
+  {
+    id: "preah_vihear",
+    name: "Preah Vihear",
+    name_kh: "ព្រះវិហារ",
+    isCapital: false,
+  },
+  { id: "prey_veng", name: "Prey Veng", name_kh: "ព្រៃវែង", isCapital: false },
+  { id: "pursat", name: "Pursat", name_kh: "ពោធិ៍សាត់", isCapital: false },
+  {
+    id: "ratanakiri",
+    name: "Ratanakiri",
+    name_kh: "រតនគិរី",
+    isCapital: false,
+  },
+  { id: "siem_reap", name: "Siem Reap", name_kh: "សៀមរាប", isCapital: false },
+  {
+    id: "stung_treng",
+    name: "Stung Treng",
+    name_kh: "ស្ទឹងត្រែង",
+    isCapital: false,
+  },
+  {
+    id: "svay_rieng",
+    name: "Svay Rieng",
+    name_kh: "ស្វាយរៀង",
+    isCapital: false,
+  },
+  { id: "takeo", name: "Takéo", name_kh: "តាកែវ", isCapital: false },
+  {
+    id: "tboung_khmum",
+    name: "Tboung Khmum",
+    name_kh: "ត្បូងឃ្មុំ",
+    isCapital: false,
+  },
+];
+
+// Delivery fee configuration
+const DELIVERY_CONFIG = {
+  freeDeliveryMinimum: 20, // Free delivery if subtotal >= $20
+  phnomPenhFee: 1.5, // $1.50 for Phnom Penh
+  provinceFee: 2.0, // $2.00 for other provinces
+};
 
 // Thank you messages (editable)
 const THANK_YOU_MESSAGES = {
@@ -73,6 +181,7 @@ export default function Order() {
   const [formData, setFormData] = useState<OrderFormData>({
     name: "",
     phone: "",
+    province: "",
     address: "",
     note: "",
   });
@@ -101,12 +210,47 @@ export default function Order() {
       ? PRODUCTS
       : PRODUCTS.filter(p => p.category === selectedCategory);
 
-  // Calculate total
-  const totalAmount = cart.reduce(
+  // Calculate subtotal (products only)
+  const subtotal = cart.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Calculate delivery fee
+  const calculateDeliveryFee = (): number => {
+    // Free delivery if subtotal >= $20
+    if (subtotal >= DELIVERY_CONFIG.freeDeliveryMinimum) {
+      return 0;
+    }
+
+    // No province selected yet
+    if (!formData.province) {
+      return 0;
+    }
+
+    // Check if Phnom Penh
+    const selectedProvince = CAMBODIA_PROVINCES.find(
+      p => p.id === formData.province
+    );
+    if (selectedProvince?.isCapital) {
+      return DELIVERY_CONFIG.phnomPenhFee;
+    }
+
+    // Other provinces
+    return DELIVERY_CONFIG.provinceFee;
+  };
+
+  const deliveryFee = calculateDeliveryFee();
+  const totalAmount = subtotal + deliveryFee;
+  const isFreeDelivery = subtotal >= DELIVERY_CONFIG.freeDeliveryMinimum;
+
+  // Get selected province name
+  const getProvinceName = (): string => {
+    const province = CAMBODIA_PROVINCES.find(p => p.id === formData.province);
+    if (!province) return "";
+    return isKhmer ? province.name_kh : province.name;
+  };
 
   // Add to cart
   const addToCart = (product: Product) => {
@@ -184,6 +328,8 @@ export default function Order() {
               : null,
             name: formData.name,
             phone: formData.phone,
+            province: formData.province,
+            provinceName: getProvinceName(),
             address: formData.address,
             note: formData.note,
           },
@@ -194,6 +340,9 @@ export default function Order() {
             price: item.product.price,
             quantity: item.quantity,
           })),
+          subtotal: subtotal,
+          deliveryFee: deliveryFee,
+          isFreeDelivery: isFreeDelivery,
           total: totalAmount,
           currency: "USD",
           language: language,
@@ -253,6 +402,39 @@ export default function Order() {
         {labels[badge]}
       </span>
     );
+  };
+
+  // Delivery fee info component
+  const DeliveryFeeInfo = ({
+    showDetails = false,
+  }: {
+    showDetails?: boolean;
+  }) => {
+    if (isFreeDelivery) {
+      return (
+        <div className="flex items-center gap-2 text-emerald-600">
+          <Truck className="w-4 h-4" />
+          <span className="text-sm font-medium">
+            {isKhmer ? "ដឹកជញ្ជូនឥតគិតថ្លៃ!" : "Free Delivery!"}
+          </span>
+        </div>
+      );
+    }
+
+    if (showDetails) {
+      const remaining = DELIVERY_CONFIG.freeDeliveryMinimum - subtotal;
+      return (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
+          <p className="text-amber-800">
+            {isKhmer
+              ? `បន្ថែម $${remaining.toFixed(2)} ទៀតដើម្បីទទួលបានការដឹកជញ្ជូនឥតគិតថ្លៃ!`
+              : `Add $${remaining.toFixed(2)} more for free delivery!`}
+          </p>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   // Render products step (showcase style)
@@ -414,22 +596,30 @@ export default function Order() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">
-                    {isKhmer ? "សរុប" : "Total"}
+                    {isKhmer ? "សរុប" : "Subtotal"}
                   </p>
                   <p className="text-lg font-bold text-emerald-700">
-                    ${totalAmount.toFixed(2)}
+                    ${subtotal.toFixed(2)}
                   </p>
                 </div>
               </div>
 
-              <Button
-                size="lg"
-                className="bg-emerald-600 hover:bg-emerald-700 px-8"
-                onClick={() => setStep("cart")}
-              >
-                {isKhmer ? "មើលកន្រ្តក" : "View Cart"}
-                <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
-              </Button>
+              <div className="flex items-center gap-3">
+                {isFreeDelivery && (
+                  <Badge className="bg-emerald-100 text-emerald-700 border-0">
+                    <Truck className="w-3 h-3 mr-1" />
+                    {isKhmer ? "ដឹកជញ្ជូនឥតគិតថ្លៃ" : "Free Delivery"}
+                  </Badge>
+                )}
+                <Button
+                  size="lg"
+                  className="bg-emerald-600 hover:bg-emerald-700 px-8"
+                  onClick={() => setStep("cart")}
+                >
+                  {isKhmer ? "មើលកន្រ្តក" : "View Cart"}
+                  <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
+                </Button>
+              </div>
             </div>
           </motion.div>
         )}
@@ -504,6 +694,9 @@ export default function Order() {
         ))}
       </div>
 
+      {/* Free delivery hint */}
+      <DeliveryFeeInfo showDetails={true} />
+
       {/* Order summary */}
       <Card className="bg-stone-50">
         <CardContent className="p-4 space-y-3">
@@ -511,9 +704,32 @@ export default function Order() {
             <span>{isKhmer ? "ចំនួនផលិតផល" : "Items"}</span>
             <span>{totalItems}</span>
           </div>
+          <div className="flex justify-between text-gray-600">
+            <span>{isKhmer ? "តម្លៃផលិតផល" : "Subtotal"}</span>
+            <span>${subtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-gray-600">
+            <span className="flex items-center gap-1">
+              <Truck className="w-4 h-4" />
+              {isKhmer ? "ដឹកជញ្ជូន" : "Delivery"}
+            </span>
+            {isFreeDelivery ? (
+              <span className="text-emerald-600 font-medium">
+                {isKhmer ? "ឥតគិតថ្លៃ" : "FREE"}
+              </span>
+            ) : (
+              <span className="text-gray-400 text-sm">
+                {isKhmer ? "ជ្រើសរើសខេត្ត/ក្រុង" : "Select province"}
+              </span>
+            )}
+          </div>
           <div className="flex justify-between text-lg font-bold border-t pt-3">
             <span>{isKhmer ? "សរុប" : "Total"}</span>
-            <span className="text-emerald-700">${totalAmount.toFixed(2)}</span>
+            <span className="text-emerald-700">
+              {isFreeDelivery
+                ? `$${subtotal.toFixed(2)}`
+                : `$${subtotal.toFixed(2)}+`}
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -576,9 +792,39 @@ export default function Order() {
             />
           </div>
 
+          {/* Province/City dropdown */}
           <div>
             <label className="text-sm font-medium text-gray-700">
-              {isKhmer ? "អាសយដ្ឋានដឹកជញ្ជូន" : "Delivery Address"} *
+              {isKhmer ? "ខេត្ត/ក្រុង" : "Province/City"} *
+            </label>
+            <select
+              value={formData.province}
+              onChange={e =>
+                setFormData(prev => ({ ...prev, province: e.target.value }))
+              }
+              className="mt-1 w-full h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <option value="">
+                {isKhmer
+                  ? "-- ជ្រើសរើសខេត្ត/ក្រុង --"
+                  : "-- Select Province/City --"}
+              </option>
+              {CAMBODIA_PROVINCES.map(province => (
+                <option key={province.id} value={province.id}>
+                  {isKhmer ? province.name_kh : province.name}
+                  {province.isCapital
+                    ? isKhmer
+                      ? " (រាជធានី)"
+                      : " (Capital)"
+                    : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              {isKhmer ? "អាសយដ្ឋានលម្អិត" : "Detailed Address"} *
             </label>
             <Textarea
               value={formData.address}
@@ -586,7 +832,9 @@ export default function Order() {
                 setFormData(prev => ({ ...prev, address: e.target.value }))
               }
               placeholder={
-                isKhmer ? "បញ្ចូលអាសយដ្ឋានពេញលេញ" : "Enter full address"
+                isKhmer
+                  ? "ផ្ទះលេខ, ផ្លូវ, សង្កាត់/ឃុំ, ខណ្ឌ/ស្រុក..."
+                  : "House #, Street, Commune/Sangkat, District/Khan..."
               }
               rows={3}
               className="mt-1"
@@ -612,11 +860,54 @@ export default function Order() {
         </CardContent>
       </Card>
 
+      {/* Delivery fee summary */}
+      <Card className="bg-stone-50">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex justify-between text-gray-600">
+            <span>{isKhmer ? "តម្លៃផលិតផល" : "Subtotal"}</span>
+            <span>${subtotal.toFixed(2)}</span>
+          </div>
+
+          <div className="flex justify-between text-gray-600">
+            <span className="flex items-center gap-1">
+              <Truck className="w-4 h-4" />
+              {isKhmer ? "ដឹកជញ្ជូន" : "Delivery"}
+              {formData.province && !isFreeDelivery && (
+                <span className="text-xs text-gray-400">
+                  ({getProvinceName()})
+                </span>
+              )}
+            </span>
+            {isFreeDelivery ? (
+              <span className="text-emerald-600 font-medium">
+                {isKhmer ? "ឥតគិតថ្លៃ" : "FREE"}
+              </span>
+            ) : formData.province ? (
+              <span>${deliveryFee.toFixed(2)}</span>
+            ) : (
+              <span className="text-amber-600 text-sm">
+                {isKhmer ? "ជ្រើសរើសខេត្ត/ក្រុង" : "Select province"}
+              </span>
+            )}
+          </div>
+
+          <div className="flex justify-between text-lg font-bold border-t pt-3">
+            <span>{isKhmer ? "សរុបត្រូវបង់" : "Total to Pay"}</span>
+            <span className="text-emerald-700">${totalAmount.toFixed(2)}</span>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Continue button */}
       <Button
         className="w-full bg-emerald-600 hover:bg-emerald-700"
         size="lg"
-        disabled={!formData.name || !formData.phone || !formData.address}
+        disabled={
+          !formData.name ||
+          !formData.phone ||
+          !formData.province ||
+          !formData.address
+        }
         onClick={() => setStep("payment")}
       >
         {isKhmer ? "បន្តទៅការបង់ប្រាក់" : "Continue to Payment"}
@@ -639,13 +930,32 @@ export default function Order() {
         <div className="w-20" />
       </div>
 
-      {/* Amount to pay */}
+      {/* Amount breakdown */}
       <Card className="bg-emerald-600 text-white border-0">
-        <CardContent className="py-8 text-center">
-          <p className="text-emerald-100">
-            {isKhmer ? "ចំនួនត្រូវបង់" : "Amount to pay"}
-          </p>
-          <p className="text-5xl font-bold mt-2">${totalAmount.toFixed(2)}</p>
+        <CardContent className="py-6 space-y-2">
+          <div className="flex justify-between text-emerald-100 text-sm">
+            <span>{isKhmer ? "តម្លៃផលិតផល" : "Subtotal"}</span>
+            <span>${subtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-emerald-100 text-sm">
+            <span className="flex items-center gap-1">
+              <Truck className="w-3 h-3" />
+              {isKhmer ? "ដឹកជញ្ជូន" : "Delivery"} ({getProvinceName()})
+            </span>
+            {isFreeDelivery ? (
+              <span>{isKhmer ? "ឥតគិតថ្លៃ" : "FREE"}</span>
+            ) : (
+              <span>${deliveryFee.toFixed(2)}</span>
+            )}
+          </div>
+          <div className="border-t border-emerald-500 pt-3 mt-2">
+            <p className="text-emerald-100 text-center text-sm">
+              {isKhmer ? "ចំនួនត្រូវបង់" : "Amount to pay"}
+            </p>
+            <p className="text-4xl font-bold text-center mt-1">
+              ${totalAmount.toFixed(2)}
+            </p>
+          </div>
         </CardContent>
       </Card>
 
@@ -660,7 +970,7 @@ export default function Order() {
           {/* Bank QR Image */}
           <div className="bg-white p-4 rounded-xl shadow-sm border">
             <img
-              src="/qr-payment.jpg"
+              src="/qr-payment.jpeg"
               alt="Payment QR Code"
               className="w-72 h-72 object-contain"
             />
