@@ -22,6 +22,16 @@ const CONFIG = {
   // Business Info
   BUSINESS_NAME: "LinLin Natural Cosmetic",
   BUSINESS_NAME_KH: "លីនលីន ទឹកពន្លៃ",
+
+  // URLs
+  WEBSITE_URL: "https://linlin-terkpley.up.railway.app",
+  SHOP_URL: "https://linlin-terkpley.up.railway.app/order",
+  CHANNEL_URL: "https://t.me/Haosreylin",
+  FACEBOOK_URL: "https://www.facebook.com/svdlin/",
+  TIKTOK_URL: "https://www.tiktok.com/@eee_linn168",
+  INSTAGRAM_URL: "https://www.instagram.com/eee_linn?igsh=MTlvZGY1Y2k4dDU2cQ==",
+  CONTACT_URL: "https://t.me/+855969447146",
+  ALL_LINKS_URL: "https://linkbio.co/HaoSreyLin",
 };
 
 // Configure multer for file uploads
@@ -39,9 +49,9 @@ const upload = multer({
 
 // Send message to Telegram
 async function sendTelegramMessage(
-  chatId: string,
+  chatId: string | number,
   text: string,
-  parseMode: string = "HTML"
+  options: any = {}
 ) {
   const url = `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`;
 
@@ -51,7 +61,8 @@ async function sendTelegramMessage(
     body: JSON.stringify({
       chat_id: chatId,
       text: text,
-      parse_mode: parseMode,
+      parse_mode: "HTML",
+      ...options,
     }),
   });
 
@@ -97,7 +108,6 @@ function generateOrderId(): string {
 function formatOrderMessage(orderId: string, orderData: any): string {
   const { customer, items, total, deliveryFee } = orderData;
 
-  // Build items list - use Khmer names
   const itemsList = items
     .map(
       (item: any) =>
@@ -105,7 +115,6 @@ function formatOrderMessage(orderId: string, orderData: any): string {
     )
     .join("\n");
 
-  // Format message in Khmer
   const message = `
 🛒 <b>ការបញ្ជាទិញថ្មី: ${orderId}</b>
 
@@ -134,34 +143,6 @@ ${itemsList}
 }
 
 // Format confirmation message for customer
-// function formatConfirmationMessage(orderId: string, language: string): string {
-//   if (language === "kh") {
-//     return `
-// ✅ <b>បញ្ជាទិញបានជោគជ័យ!</b>
-
-// 🆔 លេខបញ្ជាទិញ: <b>${orderId}</b>
-
-// សូមអរគុណ! សម្រាប់ការគាំទ្រផលិតផលធម្មជាតិខ្មែរ។ យើងបានទទួលការបញ្ជាទិញរបស់អ្នកហើយ។ យើងនឹងរៀបចំកញ្ចប់សម្រាប់ដឹកជញ្ជូនទៅអ្នក។
-
-// 📞 ប្រសិនបើមានសំណួរ សូមទំនាក់ទំនងមកយើង។
-
-// 🏪 ${CONFIG.BUSINESS_NAME_KH}
-//     `.trim();
-//   }
-
-//   return `
-// ✅ <b>Order Successful!</b>
-
-// 🆔 Order ID: <b>${orderId}</b>
-
-// Thank you for supporting natural Khmer products! We have received your order. We will prepare package for delivery to you.
-
-// 📞 If you have any questions, please contact us.
-
-// 🏪 ${CONFIG.BUSINESS_NAME}
-//   `.trim();
-// }
-// Format confirmation message for customer
 function formatConfirmationMessage(orderId: string, language: string): string {
   return `
 ✅ <b>ការបញ្ជាទិញបានជោគជ័យ!</b>
@@ -173,9 +154,123 @@ function formatConfirmationMessage(orderId: string, language: string): string {
 🙏🏻Thank you for supporting natural Khmer products! We have received your order. We will prepare package for delivery to you.📦
 
 ☎️ ប្រសិនបើអ្នកមានសំណួរណាមួយ សូមទាក់ទងមកយើងខ្ញុំ។
-Telegram contact : 0969447146
-Facebook-Page : លីនលីន ទឹកពន្លៃស្រស់ / លីនលីន ទឹកពន្លៃសាច់ចាំ
+📱 Telegram/Phone : 0969447146
+📘 Facebook: លីនលីន ទឹកពន្លៃស្រស់ / លីនលីន ទឹកពន្លៃសាច់ចាំ
   `.trim();
+}
+
+/*
+ * ========================================
+ * BOT COMMAND HANDLERS
+ * ========================================
+ */
+
+// Handle /start command
+async function handleStartCommand(chatId: number, firstName: string) {
+  const welcomeMessage = `
+🌿 <b>សូមស្វាគមន៍មកកាន់ LinLin Natural Cosmetic!</b>
+Welcome to LinLin Natural Cosmetic!
+
+សួស្តី ${firstName}! 👋
+
+យើងខ្ញុំមានផលិតផលថែរក្សាស្បែកធម្មជាតិខ្មែរ។
+We offer natural Khmer skincare products.
+
+សូមជ្រើសរើសមុខងារខាងក្រោម៖
+  `.trim();
+
+  const keyboard = {
+    inline_keyboard: [
+      [{ text: "🛒 Shop Now | ទិញផលិតផល", web_app: { url: CONFIG.SHOP_URL } }],
+      [
+        { text: "🌐 Website", url: CONFIG.WEBSITE_URL },
+        { text: "📢 Channel", url: CONFIG.CHANNEL_URL },
+      ],
+      [
+        { text: "📘 Facebook", url: CONFIG.FACEBOOK_URL },
+        { text: "🎵 TikTok", url: CONFIG.TIKTOK_URL },
+      ],
+      [
+        { text: "📸 Instagram", url: CONFIG.INSTAGRAM_URL },
+        { text: "📞 Contact", url: CONFIG.CONTACT_URL },
+      ],
+      [{ text: "🔗 All Links | តំណទាំងអស់", url: CONFIG.ALL_LINKS_URL }],
+    ],
+  };
+
+  await sendTelegramMessage(chatId, welcomeMessage, { reply_markup: keyboard });
+}
+
+// Handle /shop command
+async function handleShopCommand(chatId: number) {
+  const message = "🛒 ចុចប៊ូតុងខាងក្រោមដើម្បីទិញផលិតផល\nTap below to shop:";
+
+  const keyboard = {
+    inline_keyboard: [
+      [{ text: "🛒 Open Shop | បើកហាង", web_app: { url: CONFIG.SHOP_URL } }],
+    ],
+  };
+
+  await sendTelegramMessage(chatId, message, { reply_markup: keyboard });
+}
+
+// Handle /contact command
+async function handleContactCommand(chatId: number) {
+  const message = `
+📞 <b>ទំនាក់ទំនង | Contact Us</b>
+
+📱 Telegram/Phone : 0969447146
+📘 Facebook: លីនលីន ទឹកពន្លៃស្រស់ / លីនលីន ទឹកពន្លៃសាច់ចាំ
+  `.trim();
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        { text: "📱 Telegram", url: CONFIG.CONTACT_URL },
+        { text: "📘 Facebook", url: CONFIG.FACEBOOK_URL },
+      ],
+    ],
+  };
+
+  await sendTelegramMessage(chatId, message, { reply_markup: keyboard });
+}
+
+// Handle /links command
+async function handleLinksCommand(chatId: number) {
+  const message = "🔗 តំណភ្ជាប់ទាំងអស់ | All Our Links:";
+
+  const keyboard = {
+    inline_keyboard: [
+      [{ text: "🔗 Open All Links", url: CONFIG.ALL_LINKS_URL }],
+    ],
+  };
+
+  await sendTelegramMessage(chatId, message, { reply_markup: keyboard });
+}
+
+// Process incoming bot message
+async function processBotUpdate(update: any) {
+  try {
+    const message = update.message;
+    if (!message || !message.text) return;
+
+    const chatId = message.chat.id;
+    const text = message.text;
+    const firstName = message.from?.first_name || "";
+
+    // Handle commands
+    if (text === "/start" || text.startsWith("/start ")) {
+      await handleStartCommand(chatId, firstName);
+    } else if (text === "/shop") {
+      await handleShopCommand(chatId);
+    } else if (text === "/contact") {
+      await handleContactCommand(chatId);
+    } else if (text === "/links") {
+      await handleLinksCommand(chatId);
+    }
+  } catch (error) {
+    console.error("Error processing bot update:", error);
+  }
 }
 
 /*
@@ -202,13 +297,23 @@ async function startServer() {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
+  // Telegram webhook endpoint
+  app.post("/api/telegram/webhook", async (req, res) => {
+    try {
+      await processBotUpdate(req.body);
+      res.json({ ok: true });
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.json({ ok: true }); // Always return 200 to Telegram
+    }
+  });
+
   // Submit order
   app.post(
     "/api/orders",
     upload.single("transactionImage"),
     async (req, res) => {
       try {
-        // Parse order data
         const orderData = JSON.parse(req.body.orderData);
         const transactionImage = req.file;
 
@@ -219,23 +324,17 @@ async function startServer() {
           });
         }
 
-        // Generate order ID
         const orderId = generateOrderId();
-
-        // Format message for staff group
         const staffMessage = formatOrderMessage(orderId, orderData);
 
-        // Send order details to staff group
         await sendTelegramMessage(CONFIG.STAFF_GROUP_ID, staffMessage);
 
-        // Send transaction image to staff group
         await sendTelegramPhoto(
           CONFIG.STAFF_GROUP_ID,
           transactionImage.buffer,
           `📸 Receipt for order ${orderId}`
         );
 
-        // Send confirmation to customer (if Telegram ID available)
         if (orderData.customer.telegramId) {
           const confirmMessage = formatConfirmationMessage(
             orderId,
@@ -248,11 +347,9 @@ async function startServer() {
             );
           } catch (e) {
             console.log("Could not send confirmation to user:", e);
-            // Don't fail the order if user confirmation fails
           }
         }
 
-        // Log order (in production, save to database)
         console.log(`✅ Order ${orderId} created:`, {
           customer: orderData.customer.name,
           phone: orderData.customer.phone,
@@ -260,7 +357,6 @@ async function startServer() {
           items: orderData.items.length,
         });
 
-        // Return success
         res.json({
           success: true,
           orderId,
@@ -282,31 +378,23 @@ async function startServer() {
    * ========================================
    */
 
-  // Serve static files from dist/public in production
-  // const staticPath =
-  //   process.env.NODE_ENV === "production"
-  //     ? path.resolve(__dirname, "public")
-  //     : path.resolve(__dirname, "..", "dist", "public");
-
   const staticPath = path.resolve(__dirname, "..", "dist", "public");
 
   app.use(express.static(staticPath));
 
-  // Handle client-side routing - serve index.html for all routes
   app.get("*", (_req, res) => {
     res.sendFile(path.resolve(__dirname, "..", "dist", "public", "index.html"));
-    // res.sendFile(path.join(staticPath, "index.html"));
   });
 
   /*
    * ========================================
-   * START SERVER
+   * START SERVER & SET WEBHOOK
    * ========================================
    */
 
   const port = process.env.PORT || 3000;
 
-  server.listen(port, () => {
+  server.listen(port, async () => {
     console.log(`
 ╔════════════════════════════════════════════╗
 ║   ${CONFIG.BUSINESS_NAME}                  
@@ -314,6 +402,20 @@ async function startServer() {
 ║   Staff Group: ${CONFIG.STAFF_GROUP_ID}
 ╚════════════════════════════════════════════╝
     `);
+
+    // Set Telegram webhook (only in production)
+    if (process.env.NODE_ENV === "production") {
+      const webhookUrl = `${CONFIG.WEBSITE_URL}/api/telegram/webhook`;
+      try {
+        const response = await fetch(
+          `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/setWebhook?url=${webhookUrl}`
+        );
+        const result = await response.json();
+        console.log("Webhook set:", result);
+      } catch (error) {
+        console.error("Failed to set webhook:", error);
+      }
+    }
   });
 }
 
