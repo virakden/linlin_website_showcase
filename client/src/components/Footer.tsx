@@ -3,7 +3,7 @@
  * Footer with bilingual support and social links
  */
 
-import { STORE_CONFIG } from "@/lib/products";
+import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ShoppingBag } from "lucide-react";
 

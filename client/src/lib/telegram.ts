@@ -123,6 +123,22 @@ export function openTelegramChat(message?: string): void {
   }
 }
 
+// For personal Telegram contact (using phone number)
+export function openTelegramPersonal(message?: string): void {
+  const phone = "855969447146";
+  let url = `https://t.me/+${phone}`;
+
+  if (message) {
+    url += `?text=${encodeURIComponent(message)}`;
+  }
+
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.openLink(url);
+  } else {
+    window.open(url, "_blank");
+  }
+}
+
 /**
  * Trigger haptic feedback
  */

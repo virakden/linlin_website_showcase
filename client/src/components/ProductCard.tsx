@@ -3,7 +3,8 @@
  * Product card with bilingual text, video link, and Telegram inquiry
  */
 
-import { Product, STORE_CONFIG } from "@/lib/products";
+import { Product } from "@/lib/products";
+import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { openTelegramChat, hapticFeedback } from "@/lib/telegram";
 import { Send, Eye, Play } from "lucide-react";
@@ -21,7 +22,11 @@ interface ProductCardProps {
   onViewDetails: (product: Product) => void;
 }
 
-export default function ProductCard({ product, index, onViewDetails }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  index,
+  onViewDetails,
+}: ProductCardProps) {
   const { language, t } = useLanguage();
 
   const name = language === "kh" ? product.name_kh : product.name;
@@ -47,7 +52,11 @@ export default function ProductCard({ product, index, onViewDetails }: ProductCa
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+      transition={{
+        duration: 0.5,
+        delay: index * 0.08,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      }}
       layout
       className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-border/40 cursor-pointer"
       onClick={() => {
@@ -64,7 +73,9 @@ export default function ProductCard({ product, index, onViewDetails }: ProductCa
           loading="lazy"
         />
         {product.badge && (
-          <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wide ${BADGE_STYLES[product.badge]}`}>
+          <span
+            className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wide ${BADGE_STYLES[product.badge]}`}
+          >
             {product.badge}
           </span>
         )}
@@ -72,7 +83,10 @@ export default function ProductCard({ product, index, onViewDetails }: ProductCa
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-walnut/0 group-hover:bg-walnut/20 transition-colors duration-300 flex items-center justify-center gap-2.5 opacity-0 group-hover:opacity-100">
           <button
-            onClick={(e) => { e.stopPropagation(); onViewDetails(product); }}
+            onClick={e => {
+              e.stopPropagation();
+              onViewDetails(product);
+            }}
             className="p-2.5 bg-white/95 rounded-xl shadow-lg hover:bg-white transition-colors"
             title={t.products_view_details}
           >
@@ -107,7 +121,8 @@ export default function ProductCard({ product, index, onViewDetails }: ProductCa
         </p>
         <div className="flex items-center justify-between">
           <span className="font-display font-bold text-teal text-lg">
-            {STORE_CONFIG.currencySymbol}{product.price.toFixed(2)}
+            {STORE_CONFIG.currencySymbol}
+            {product.price.toFixed(2)}
           </span>
           <button
             onClick={handleInquiry}

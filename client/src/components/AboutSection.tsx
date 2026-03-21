@@ -3,7 +3,7 @@
  * About / How It Works section with bilingual support
  */
 
-import { STORE_CONFIG } from "@/lib/products";
+import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { openTelegramChat } from "@/lib/telegram";
 import { Search, MessageSquare, Package, Send } from "lucide-react";
@@ -13,9 +13,24 @@ export default function AboutSection() {
   const { t } = useLanguage();
 
   const steps = [
-    { icon: Search, title: t.about_step1_title, desc: t.about_step1_desc, step: "01" },
-    { icon: MessageSquare, title: t.about_step2_title, desc: t.about_step2_desc, step: "02" },
-    { icon: Package, title: t.about_step3_title, desc: t.about_step3_desc, step: "03" },
+    {
+      icon: Search,
+      title: t.about_step1_title,
+      desc: t.about_step1_desc,
+      step: "01",
+    },
+    {
+      icon: MessageSquare,
+      title: t.about_step2_title,
+      desc: t.about_step2_desc,
+      step: "02",
+    },
+    {
+      icon: Package,
+      title: t.about_step3_title,
+      desc: t.about_step3_desc,
+      step: "03",
+    },
   ];
 
   return (

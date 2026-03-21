@@ -6,7 +6,7 @@
 
 import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { openTelegramChat } from "@/lib/telegram";
+import { openTelegramChat, openTelegramPersonal } from "@/lib/telegram";
 import { Send, ExternalLink, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -54,7 +54,7 @@ const SOCIAL_LINKS = [
     hoverColor: "hover:bg-[#229ED9]",
     getTitle: (t: any) => t.contact_telegram_title,
     getDesc: (t: any) => t.contact_telegram_desc,
-    getUrl: () => `https://t.me/${STORE_CONFIG.telegramUsername}`,
+    getUrl: () => `https://t.me/+855969447146`,
     canContact: true,
   },
   {
@@ -187,10 +187,7 @@ export default function ContactSection() {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() =>
-                openTelegramChat(
-                  STORE_CONFIG.telegramUsername,
-                  "Hi! I'd like to place an order."
-                )
+                openTelegramPersonal("Hi! I'm interested in your products.")
               }
               className="flex-1 flex items-center justify-center gap-2.5 px-5 py-3 bg-[#2AABEE] text-white rounded-xl font-semibold text-sm hover:bg-[#229ED9] transition-colors shadow-md"
             >

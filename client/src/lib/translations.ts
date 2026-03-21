@@ -294,7 +294,7 @@ export const translations: Record<Language, Translations> = {
     miniapp_badge: "Telegram Mini App",
     miniapp_title: "បញ្ជាទិញផ្ទាល់ក្នុង Telegram",
     miniapp_subtitle:
-      "ប្រើ Mini App របស់យើងក្នុង Telegram សម្រាប់បទពិសោធន៍បញ្ជាទិញលឿនបំផុត។ រកមើល បញ្ជាទិញ និងតាមដាន — ទាំងអស់ដោយមិនចាកចេញពី Telegram។",
+      "ប្រើ Mini App របស់យើងក្នុង Telegram សម្រាប់បទពិសោធន៍បញ្ជាទិញលឿនបំផុត។ រកមើល បញ្ជាទិញ និងតាមដានទាំងអស់ដោយមិនចាកចេញពី Telegram។",
     miniapp_open_button: "បើក Mini App",
     miniapp_join_channel: "ចូលរួមឆានែលរបស់យើង",
     miniapp_feature1: "រកមើល និងបញ្ជាទិញផលិតផលភ្លាមៗ",

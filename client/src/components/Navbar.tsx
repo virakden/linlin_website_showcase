@@ -4,9 +4,13 @@
  * FIXED: Mobile menu clicks, language switcher readability, nav wrapping, active states
  */
 
-import { STORE_CONFIG } from "@/lib/products";
+import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { openTelegramChat, isTelegramWebApp } from "@/lib/telegram";
+import {
+  openTelegramChat,
+  isTelegramWebApp,
+  openTelegramPersonal,
+} from "@/lib/telegram";
 import { Send, Menu, X, Globe } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -158,10 +162,7 @@ export default function Navbar() {
           {!isTg && (
             <button
               onClick={() =>
-                openTelegramChat(
-                  STORE_CONFIG.telegramUsername,
-                  "Hi! I'm interested in your products."
-                )
+                openTelegramPersonal("Hi! I'm interested in your products.")
               }
               className="flex items-center gap-2 px-4 py-2 bg-teal text-white rounded-xl text-sm font-semibold hover:bg-teal-dark transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
             >
@@ -252,8 +253,7 @@ export default function Navbar() {
                   type="button"
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    openTelegramChat(
-                      STORE_CONFIG.telegramUsername,
+                    openTelegramPersonal(
                       "Hi! I'm interested in your products."
                     );
                   }}

@@ -495,7 +495,7 @@ export const STORE_CONFIG = {
   phone: "096 9447 146",
 
   // Social Links - Update these with your real links
-  telegramUsername: "https://t.me/Eee_linn",
+  telegramUsername: "https://t.me/+855969447146",
   telegramChannel: "https://t.me/Haosreylin",
   facebookPage: "https://facebook.com/linlin.skincare",
   tiktok: "https://tiktok.com/@linlin.skincare",

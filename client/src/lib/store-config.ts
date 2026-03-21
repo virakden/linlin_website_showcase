@@ -30,7 +30,7 @@ export const STORE_CONFIG = {
   },
 
   // Social Links - Replace with your real links
-  telegramUsername: "https://t.me/Eee_linn",
+  telegramUsername: "https://t.me/+855969447146",
   telegramChannel: "https://t.me/Haosreylin", // Your Telegram channel
   telegramMiniApp: "https://t.me/linlin_skincare_bot/shop", // Mini App link (set later)
   facebookPage: "https://www.facebook.com/svdlin/", // Your Facebook page

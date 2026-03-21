@@ -3,7 +3,8 @@
  * Product detail modal with bilingual text, video link, Telegram inquiry
  */
 
-import { Product, STORE_CONFIG } from "@/lib/products";
+import { Product } from "@/lib/products";
+import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { openTelegramChat, hapticFeedback } from "@/lib/telegram";
 import { X, Send, Check, Package, Play, ExternalLink } from "lucide-react";
@@ -21,7 +22,10 @@ interface ProductDetailModalProps {
   onClose: () => void;
 }
 
-export default function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
+export default function ProductDetailModal({
+  product,
+  onClose,
+}: ProductDetailModalProps) {
   const { language, t } = useLanguage();
 
   useEffect(() => {
@@ -30,7 +34,9 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
     } else {
       document.body.style.overflow = "";
     }
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [product]);
 
   const handleInquiry = () => {
@@ -82,7 +88,9 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                   className="w-full h-full object-cover"
                 />
                 {product.badge && (
-                  <span className={`absolute top-4 left-4 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide ${BADGE_STYLES[product.badge]}`}>
+                  <span
+                    className={`absolute top-4 left-4 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide ${BADGE_STYLES[product.badge]}`}
+                  >
                     {product.badge}
                   </span>
                 )}
@@ -95,12 +103,15 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                     {language === "kh" ? product.name_kh : product.name}
                   </h2>
                   <span className="font-display font-bold text-xl md:text-2xl text-teal whitespace-nowrap">
-                    {STORE_CONFIG.currencySymbol}{product.price.toFixed(2)}
+                    {STORE_CONFIG.currencySymbol}
+                    {product.price.toFixed(2)}
                   </span>
                 </div>
 
                 <p className="text-walnut-light text-base leading-relaxed mb-4">
-                  {language === "kh" ? product.description_kh : product.description}
+                  {language === "kh"
+                    ? product.description_kh
+                    : product.description}
                 </p>
 
                 {/* Stock + Video Link row */}
@@ -108,7 +119,9 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                   <div className="flex items-center gap-2">
                     <Package className="w-4 h-4 text-teal" />
                     <span className="text-sm font-medium text-teal">
-                      {product.inStock ? t.detail_in_stock : t.detail_out_of_stock}
+                      {product.inStock
+                        ? t.detail_in_stock
+                        : t.detail_out_of_stock}
                     </span>
                   </div>
                   {product.videoLink && (
@@ -121,7 +134,9 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                       <Play className="w-3.5 h-3.5" />
                       {t.detail_watch_video}
                       {product.videoSource && (
-                        <span className="text-xs opacity-75">({product.videoSource})</span>
+                        <span className="text-xs opacity-75">
+                          ({product.videoSource})
+                        </span>
                       )}
                       <ExternalLink className="w-3 h-3" />
                     </a>
@@ -130,7 +145,8 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
 
                 {/* Details list */}
                 {(() => {
-                  const details = language === "kh" ? product.details_kh : product.details;
+                  const details =
+                    language === "kh" ? product.details_kh : product.details;
                   return details && details.length > 0 ? (
                     <div className="mb-6">
                       <h3 className="font-display font-semibold text-sm text-walnut mb-3 uppercase tracking-wide">
@@ -138,7 +154,10 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                       </h3>
                       <ul className="space-y-2">
                         {details.map((detail, i) => (
-                          <li key={i} className="flex items-center gap-2.5 text-sm text-walnut-light">
+                          <li
+                            key={i}
+                            className="flex items-center gap-2.5 text-sm text-walnut-light"
+                          >
                             <Check className="w-4 h-4 text-teal flex-shrink-0" />
                             {detail}
                           </li>

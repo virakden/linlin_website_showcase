@@ -5,7 +5,6 @@
 
 import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { openTelegramChat } from "@/lib/telegram";
 import { ArrowDown, Package } from "lucide-react";
 import { motion } from "framer-motion";
 
