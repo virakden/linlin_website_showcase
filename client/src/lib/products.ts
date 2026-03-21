@@ -485,6 +485,7 @@ export const STORE_CONFIG = {
   name_kh: "លីនលីន ទឹកពន្លៃ",
   tagline: "Natural Khmer Skincare Products",
   tagline_kh: "ផលិតផលថែរក្សាស្បែកធម្មជាតិខ្មែរ",
+  logoUrl: "/logo.png",
   description:
     "Handmade natural skincare products from Cambodia. Traditional recipes with modern care.",
   description_kh:
