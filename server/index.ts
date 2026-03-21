@@ -134,31 +134,47 @@ ${itemsList}
 }
 
 // Format confirmation message for customer
+// function formatConfirmationMessage(orderId: string, language: string): string {
+//   if (language === "kh") {
+//     return `
+// ✅ <b>បញ្ជាទិញបានជោគជ័យ!</b>
+
+// 🆔 លេខបញ្ជាទិញ: <b>${orderId}</b>
+
+// សូមអរគុណ! សម្រាប់ការគាំទ្រផលិតផលធម្មជាតិខ្មែរ។ យើងបានទទួលការបញ្ជាទិញរបស់អ្នកហើយ។ យើងនឹងរៀបចំកញ្ចប់សម្រាប់ដឹកជញ្ជូនទៅអ្នក។
+
+// 📞 ប្រសិនបើមានសំណួរ សូមទំនាក់ទំនងមកយើង។
+
+// 🏪 ${CONFIG.BUSINESS_NAME_KH}
+//     `.trim();
+//   }
+
+//   return `
+// ✅ <b>Order Successful!</b>
+
+// 🆔 Order ID: <b>${orderId}</b>
+
+// Thank you for supporting natural Khmer products! We have received your order. We will prepare package for delivery to you.
+
+// 📞 If you have any questions, please contact us.
+
+// 🏪 ${CONFIG.BUSINESS_NAME}
+//   `.trim();
+// }
+// Format confirmation message for customer
 function formatConfirmationMessage(orderId: string, language: string): string {
-  if (language === "kh") {
-    return `
-✅ <b>បញ្ជាទិញបានជោគជ័យ!</b>
-
-🆔 លេខបញ្ជាទិញ: <b>${orderId}</b>
-
-សូមអរគុណ! សម្រាប់ការគាំទ្រផលិតផលធម្មជាតិខ្មែរ។ យើងបានទទួលការបញ្ជាទិញរបស់អ្នកហើយ។ យើងនឹងរៀបចំកញ្ចប់សម្រាប់ដឹកជញ្ជូនទៅអ្នក។
-
-📞 ប្រសិនបើមានសំណួរ សូមទំនាក់ទំនងមកយើង។
-
-🏪 ${CONFIG.BUSINESS_NAME_KH}
-    `.trim();
-  }
-
   return `
-✅ <b>Order Successful!</b>
+✅ <b>ការបញ្ជាទិញបានជោគជ័យ!</b>
 
-🆔 Order ID: <b>${orderId}</b>
+🆔 លេខសម្គាល់ការបញ្ជាទិញ៖ <b>${orderId}</b>
 
-Thank you for supporting natural Khmer products! We have received your order. We will prepare package for delivery to you.
+🙏🏻សូមអរគុណសម្រាប់ការគាំទ្រផលិតផលធម្មជាតិខ្មែរ! យើងបានទទួលការបញ្ជាទិញរបស់អ្នកហើយ។ យើងនឹងរៀបចំកញ្ចប់សម្រាប់ដឹកជញ្ជូនទៅអ្នក។ 📦
 
-📞 If you have any questions, please contact us.
+🙏🏻Thank you for supporting natural Khmer products! We have received your order. We will prepare package for delivery to you.📦
 
-🏪 ${CONFIG.BUSINESS_NAME}
+☎️ ប្រសិនបើអ្នកមានសំណួរណាមួយ សូមទាក់ទងមកយើងខ្ញុំ។
+Telegram contact : 0969447146
+Facebook-Page : លីនលីន ទឹកពន្លៃស្រស់ / លីនលីន ទឹកពន្លៃសាច់ចាំ
   `.trim();
 }
 

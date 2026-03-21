@@ -1,41 +1,95 @@
 /*
  * Design: "Bazaar Fresh" — Warm Marketplace
  * Navbar with language switcher (EN/KH), store name, navigation, Telegram CTA
- * FIXED: Mobile menu clicks, language switcher readability, nav wrapping
+ * FIXED: Mobile menu clicks, language switcher readability, nav wrapping, active states
  */
 
 import { STORE_CONFIG } from "@/lib/products";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { openTelegramChat, isTelegramWebApp } from "@/lib/telegram";
 import { Send, Menu, X, Globe } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link, useLocation } from "wouter";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [location] = useLocation();
   const { language, t, toggleLanguage } = useLanguage();
   const isTg = isTelegramWebApp();
+  const [activeSection, setActiveSection] = useState("");
 
   const storeName =
     language === "kh" ? STORE_CONFIG.name_kh : STORE_CONFIG.name;
 
-  // FIXED: Use callback to ensure menu closes properly
-  const scrollTo = useCallback((id: string) => {
-    setMobileMenuOpen(false); // Close menu first
+  // Track scroll position to highlight active section
+  useEffect(() => {
+    if (location !== "/") {
+      setActiveSection("");
+      return;
+    }
 
-    // Small delay to allow menu to close before scrolling
-    setTimeout(() => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+    const handleScroll = () => {
+      const sections = ["products", "contact", "miniapp", "about"];
+      for (const id of sections) {
+        const element = document.getElementById(id);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 150 && rect.bottom >= 150) {
+            setActiveSection(id);
+            break;
+          }
+        }
       }
-    }, 100);
-  }, []);
+    };
 
-  // FIXED: Separate handler for menu toggle
+    handleScroll(); // Check on mount
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [location]);
+
+  // Navigate to section (works from any page)
+  const scrollTo = useCallback(
+    (id: string) => {
+      setMobileMenuOpen(false);
+
+      if (location !== "/") {
+        window.location.href = "/#" + id;
+      } else {
+        setTimeout(() => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 100);
+      }
+    },
+    [location]
+  );
+
   const handleMenuToggle = useCallback(() => {
     setMobileMenuOpen(prev => !prev);
   }, []);
+
+  // Helper function for nav button styles
+  const getNavStyle = (sectionId: string) => {
+    const isActive = activeSection === sectionId && location === "/";
+    return `px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+      isActive
+        ? "text-teal bg-teal/10 font-semibold"
+        : "text-walnut hover:bg-cream-dark"
+    }`;
+  };
+
+  // Helper function for mobile nav button styles
+  const getMobileNavStyle = (sectionId: string) => {
+    const isActive = activeSection === sectionId && location === "/";
+    return `w-full text-left py-3 px-4 rounded-lg text-base font-medium transition-colors ${
+      isActive
+        ? "text-teal bg-teal/10 font-semibold"
+        : "text-walnut hover:bg-cream-dark active:bg-cream-dark"
+    }`;
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-md border-b border-border/50">
@@ -43,7 +97,7 @@ export default function Navbar() {
         {/* Logo */}
         <a href="/" className="flex items-center gap-3 flex-shrink-0">
           <img
-            src={STORE_CONFIG.logoUrl}
+            src="/logo.png"
             alt={storeName}
             className="w-10 h-10 rounded-xl object-cover shadow-sm"
           />
@@ -52,37 +106,46 @@ export default function Navbar() {
           </span>
         </a>
 
-        {/* Desktop Navigation - FIXED: prevent wrapping */}
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-1 flex-shrink-0">
           <button
             onClick={() => scrollTo("products")}
-            className="px-3 py-2 rounded-lg text-sm font-medium text-walnut hover:bg-cream-dark transition-colors whitespace-nowrap"
+            className={getNavStyle("products")}
           >
             {t.nav_products}
           </button>
           <button
             onClick={() => scrollTo("contact")}
-            className="px-3 py-2 rounded-lg text-sm font-medium text-walnut hover:bg-cream-dark transition-colors whitespace-nowrap"
+            className={getNavStyle("contact")}
           >
             {t.nav_contact}
           </button>
           <button
             onClick={() => scrollTo("miniapp")}
-            className="px-3 py-2 rounded-lg text-sm font-medium text-walnut hover:bg-cream-dark transition-colors whitespace-nowrap"
+            className={getNavStyle("miniapp")}
           >
             Mini App
           </button>
           <button
             onClick={() => scrollTo("about")}
-            className="px-3 py-2 rounded-lg text-sm font-medium text-walnut hover:bg-cream-dark transition-colors whitespace-nowrap"
+            className={getNavStyle("about")}
           >
             {t.nav_about}
           </button>
+          <Link
+            href="/order"
+            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+              location === "/order"
+                ? "text-teal bg-teal/10 font-semibold"
+                : "text-walnut hover:bg-cream-dark"
+            }`}
+          >
+            {language === "kh" ? "ទិញផលិតផល" : "Purchase"}
+          </Link>
         </nav>
 
         {/* Desktop: Language + CTA */}
         <div className="hidden md:flex items-center gap-3 flex-shrink-0">
-          {/* FIXED: Language switcher - cleaner, more readable */}
           <button
             onClick={toggleLanguage}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-cream-dark hover:bg-walnut/10 rounded-lg text-sm font-semibold text-walnut transition-colors"
@@ -110,16 +173,14 @@ export default function Navbar() {
 
         {/* Mobile: Language + Menu Toggle */}
         <div className="flex md:hidden items-center gap-2">
-          {/* FIXED: Simplified language button for mobile */}
           <button
             onClick={toggleLanguage}
-            className="flex items-center justify-center w-9 h-9 bg-cream-dark rounded-lg text-sm font-bold text-walnut"
+            className="flex items-center justify-center px-3 h-9 bg-cream-dark rounded-lg text-sm font-bold text-walnut min-w-fit"
             aria-label="Switch language"
           >
             {language === "en" ? "ខ្មែរ" : "EN"}
           </button>
 
-          {/* FIXED: Better touch target for menu button */}
           <button
             onClick={handleMenuToggle}
             className="flex items-center justify-center w-10 h-10 text-walnut rounded-lg hover:bg-cream-dark transition-colors"
@@ -135,7 +196,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu - FIXED: Better click handling */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -146,37 +207,46 @@ export default function Navbar() {
             className="md:hidden overflow-hidden bg-cream border-b border-border/50"
           >
             <nav className="container py-4 flex flex-col gap-1">
-              {/* FIXED: Using <a> tags with onClick for better touch response */}
               <button
                 type="button"
                 onClick={() => scrollTo("products")}
-                className="w-full text-left py-3 px-4 rounded-lg text-base font-medium text-walnut hover:bg-cream-dark active:bg-cream-dark transition-colors"
+                className={getMobileNavStyle("products")}
               >
                 {t.nav_products}
               </button>
               <button
                 type="button"
                 onClick={() => scrollTo("contact")}
-                className="w-full text-left py-3 px-4 rounded-lg text-base font-medium text-walnut hover:bg-cream-dark active:bg-cream-dark transition-colors"
+                className={getMobileNavStyle("contact")}
               >
                 {t.nav_contact}
               </button>
               <button
                 type="button"
                 onClick={() => scrollTo("miniapp")}
-                className="w-full text-left py-3 px-4 rounded-lg text-base font-medium text-walnut hover:bg-cream-dark active:bg-cream-dark transition-colors"
+                className={getMobileNavStyle("miniapp")}
               >
                 Mini App
               </button>
               <button
                 type="button"
                 onClick={() => scrollTo("about")}
-                className="w-full text-left py-3 px-4 rounded-lg text-base font-medium text-walnut hover:bg-cream-dark active:bg-cream-dark transition-colors"
+                className={getMobileNavStyle("about")}
               >
                 {t.nav_about}
               </button>
+              <Link
+                href="/order"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`w-full text-left py-3 px-4 rounded-lg text-base font-medium transition-colors ${
+                  location === "/order"
+                    ? "text-teal bg-teal/10 font-semibold"
+                    : "text-walnut hover:bg-cream-dark active:bg-cream-dark"
+                }`}
+              >
+                {language === "kh" ? "ទិញផលិតផល" : "Purchase"}
+              </Link>
 
-              {/* Message Us button in mobile menu */}
               {!isTg && (
                 <button
                   type="button"

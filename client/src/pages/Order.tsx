@@ -1,3 +1,4 @@
+import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { PRODUCTS, Product, CATEGORIES, STORE_CONFIG } from "@/lib/products";
@@ -1130,12 +1131,15 @@ export default function Order() {
 
   // Render based on step
   return (
-    <div className="min-h-screen bg-stone-50 p-4">
-      {step === "products" && renderProducts()}
-      {step === "cart" && renderCart()}
-      {step === "form" && renderForm()}
-      {step === "payment" && renderPayment()}
-      {step === "success" && renderSuccess()}
+    <div className="min-h-screen bg-stone-50">
+      <Navbar />
+      <div className="p-4">
+        {step === "products" && renderProducts()}
+        {step === "cart" && renderCart()}
+        {step === "form" && renderForm()}
+        {step === "payment" && renderPayment()}
+        {step === "success" && renderSuccess()}
+      </div>
     </div>
   );
 }
