@@ -1,5 +1,15 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
-import { translations, type Language, type Translations } from "@/lib/translations";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
+import {
+  translations,
+  type Language,
+  type Translations,
+} from "@/lib/translations";
 
 interface LanguageContextType {
   language: Language;
@@ -8,7 +18,9 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
@@ -16,7 +28,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const saved = localStorage.getItem("app-language");
       if (saved === "en" || saved === "kh") return saved;
     } catch {}
-    return "en";
+    return "kh";
   });
 
   const setLanguage = useCallback((lang: Language) => {
@@ -35,7 +47,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const t = translations[language];
 
   return (
-    <LanguageContext.Provider value={{ language, t, toggleLanguage, setLanguage }}>
+    <LanguageContext.Provider
+      value={{ language, t, toggleLanguage, setLanguage }}
+    >
       {children}
     </LanguageContext.Provider>
   );

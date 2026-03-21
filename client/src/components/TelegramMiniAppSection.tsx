@@ -3,9 +3,17 @@
  * Telegram Mini App section: Link to Mini App + Join Channel CTA
  */
 
-import { STORE_CONFIG } from "@/lib/products";
+import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Smartphone, Users, ShoppingCart, Bell, Gift, ExternalLink, ArrowRight } from "lucide-react";
+import {
+  Smartphone,
+  Users,
+  ShoppingCart,
+  Bell,
+  Gift,
+  ExternalLink,
+  ArrowRight,
+} from "lucide-react";
 import { motion } from "framer-motion";
 
 // Telegram SVG icon
@@ -138,7 +146,9 @@ export default function TelegramMiniAppSection() {
                     {/* Status bar */}
                     <div className="bg-[#2AABEE] px-5 py-3 flex items-center gap-2">
                       <TelegramIcon className="w-5 h-5 text-white" />
-                      <span className="text-white text-sm font-semibold">Mini App</span>
+                      <span className="text-white text-sm font-semibold">
+                        Mini App
+                      </span>
                     </div>
                     {/* Content mockup */}
                     <div className="p-4 space-y-3">
@@ -156,7 +166,9 @@ export default function TelegramMiniAppSection() {
                         <div className="h-16 bg-cream rounded-lg" />
                       </div>
                       <div className="h-10 bg-[#2AABEE] rounded-xl flex items-center justify-center">
-                        <span className="text-white text-xs font-semibold">Order Now</span>
+                        <span className="text-white text-xs font-semibold">
+                          Order Now
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -168,8 +180,12 @@ export default function TelegramMiniAppSection() {
                     <Bell className="w-4 h-4 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-walnut">New Arrival!</p>
-                    <p className="text-[10px] text-walnut-light">Check it out</p>
+                    <p className="text-xs font-semibold text-walnut">
+                      New Arrival!
+                    </p>
+                    <p className="text-[10px] text-walnut-light">
+                      Check it out
+                    </p>
                   </div>
                 </div>
               </div>

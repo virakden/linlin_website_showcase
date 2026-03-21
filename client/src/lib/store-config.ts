@@ -30,12 +30,12 @@ export const STORE_CONFIG = {
   },
 
   // Social Links - Replace with your real links
-  telegramUsername: "linlin_skincare_bot",
-  telegramChannel: "https://t.me/linlin_skincare", // Your Telegram channel
+  telegramUsername: "https://t.me/Eee_linn",
+  telegramChannel: "https://t.me/Haosreylin", // Your Telegram channel
   telegramMiniApp: "https://t.me/linlin_skincare_bot/shop", // Mini App link (set later)
   facebookPage: "https://www.facebook.com/svdlin/", // Your Facebook page
-  tiktok: "https://vt.tiktok.com/ZS9RPEWnVeRJJ-YFzog/", // Your TikTok
-  instagram: "https://instagram.com/linlinskincare", // Your Instagram
+  tiktok: "https://www.tiktok.com/@eee_linn168", // Your TikTok
+  instagram: "https://www.instagram.com/eee_linn?igsh=MTlvZGY1Y2k4dDU2cQ==", // Your Instagram
 
   // Contact
   phone: "096 9447 146",

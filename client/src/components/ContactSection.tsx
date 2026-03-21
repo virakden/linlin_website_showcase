@@ -4,7 +4,7 @@
  * Direct contact via Telegram & Facebook only
  */
 
-import { STORE_CONFIG } from "@/lib/products";
+import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { openTelegramChat } from "@/lib/telegram";
 import { Send, ExternalLink, MessageCircle } from "lucide-react";
@@ -142,7 +142,9 @@ export default function ContactSection() {
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className="bg-white rounded-2xl p-5 text-center group hover:shadow-lg transition-all duration-300 border border-border/40"
               >
-                <div className={`w-12 h-12 mx-auto mb-3 ${social.color} rounded-xl flex items-center justify-center ${social.hoverColor} transition-all`}>
+                <div
+                  className={`w-12 h-12 mx-auto mb-3 ${social.color} rounded-xl flex items-center justify-center ${social.hoverColor} transition-all`}
+                >
                   <Icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-display font-semibold text-sm text-walnut mb-1">

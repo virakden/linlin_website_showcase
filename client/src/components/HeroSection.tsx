@@ -3,10 +3,10 @@
  * Hero: Full-width banner, dark overlay → white text, bilingual
  */
 
-import { STORE_CONFIG } from "@/lib/products";
+import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { openTelegramChat } from "@/lib/telegram";
-import { ArrowDown, Send } from "lucide-react";
+import { ArrowDown, Package } from "lucide-react";
 import { motion } from "framer-motion";
 
 const HERO_IMAGE = "/hero-cover.PNG";
@@ -77,18 +77,15 @@ export default function HeroSection() {
               {t.hero_browse}
               <ArrowDown className="w-4 h-4" />
             </button>
-            <button
-              onClick={() =>
-                openTelegramChat(
-                  STORE_CONFIG.telegramUsername,
-                  "Hi! I found your store and I'm interested in your products."
-                )
-              }
+            <a
+              href={STORE_CONFIG.telegramMiniApp}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 px-6 py-3 bg-teal text-white rounded-xl font-semibold text-sm hover:bg-teal-dark transition-colors shadow-lg hover:shadow-xl"
             >
-              <Send className="w-4 h-4" />
-              {t.hero_chat_telegram}
-            </button>
+              <Package className="w-4 h-4" />
+              {language === "kh" ? "បញ្ជាទិញឥឡូវ" : "Order Now"}
+            </a>
           </motion.div>
         </div>
       </div>
