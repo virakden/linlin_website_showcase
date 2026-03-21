@@ -9,14 +9,15 @@ import { openTelegramChat } from "@/lib/telegram";
 import { ArrowDown, Send } from "lucide-react";
 import { motion } from "framer-motion";
 
-const HERO_IMAGE =
-  "https://d2xsxph8kpxj0f.cloudfront.net/94881429/4KB6uyCU5k4C5PL8SYBrx7/hero-banner-mo33C5EoW4CpAVHzyJKKut.webp";
+const HERO_IMAGE = "/hero-cover.PNG";
 
 export default function HeroSection() {
   const { language, t } = useLanguage();
 
-  const title = language === "kh" ? STORE_CONFIG.tagline_kh : STORE_CONFIG.tagline;
-  const desc = language === "kh" ? STORE_CONFIG.description_kh : STORE_CONFIG.description;
+  const title =
+    language === "kh" ? STORE_CONFIG.tagline_kh : STORE_CONFIG.tagline;
+  const desc =
+    language === "kh" ? STORE_CONFIG.description_kh : STORE_CONFIG.description;
 
   const scrollToProducts = () => {
     document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
@@ -25,7 +26,11 @@ export default function HeroSection() {
   return (
     <section id="hero" className="relative overflow-hidden">
       <div className="absolute inset-0">
-        <img src={HERO_IMAGE} alt="Marketplace" className="w-full h-full object-cover" />
+        <img
+          src={HERO_IMAGE}
+          alt="Marketplace"
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-walnut/85 via-walnut/60 to-walnut/40" />
       </div>
 
@@ -89,8 +94,17 @@ export default function HeroSection() {
       </div>
 
       <div className="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block" preserveAspectRatio="none">
-          <path d="M0 40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0V40Z" className="fill-background" />
+        <svg
+          viewBox="0 0 1440 80"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-auto block"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0 40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0V40Z"
+            className="fill-background"
+          />
         </svg>
       </div>
     </section>
