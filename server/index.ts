@@ -27,7 +27,7 @@ const CONFIG = {
   WEBSITE_URL: "https://linlin-terkpley.up.railway.app",
   SHOP_URL: "https://linlin-terkpley.up.railway.app/order",
   CHANNEL_URL: "https://t.me/Haosreylin",
-  FACEBOOK_URL: "https://www.facebook.com/svdlin/",
+  FACEBOOK_URL: "https://www.facebook.com/profile.php?id=61556083836668",
   TIKTOK_URL: "https://www.tiktok.com/@eee_linn168",
   INSTAGRAM_URL: "https://www.instagram.com/eee_linn?igsh=MTlvZGY1Y2k4dDU2cQ==",
   CONTACT_URL: "https://t.me/+855969447146",
@@ -168,12 +168,12 @@ function formatConfirmationMessage(orderId: string, language: string): string {
 // Handle /start command
 async function handleStartCommand(chatId: number, firstName: string) {
   const welcomeMessage = `
-🌿 <b>សូមស្វាគមន៍មកកាន់ LinLin Natural Cosmetic!</b>
-Welcome to LinLin Natural Cosmetic!
+🌿 <b>សូមស្វាគមន៍មកកាន់ លីនលីនទឹកពន្លៃ!</b>
+🙏🏻 <b>Welcome to LinLin Natural Cosmetic!</b>
 
 សួស្តី ${firstName}! 👋
 
-យើងខ្ញុំមានផលិតផលថែរក្សាស្បែកធម្មជាតិខ្មែរ។
+យើងខ្ញុំមានផលិតផលថែរក្សាស្បែកខ្លួន និងស្បែកមុខដែរផលិតពីធម្មជាតិខ្មែរ។
 We offer natural Khmer skincare products.
 
 សូមជ្រើសរើសមុខងារខាងក្រោម៖

@@ -177,8 +177,13 @@ export function isTelegramMiniApp(): boolean {
  */
 export function initTelegramApp(): void {
   if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.ready();
-    window.Telegram.WebApp.expand();
+    const webApp = window.Telegram.WebApp;
+
+    webApp.ready();
+
+    setTimeout(() => {
+      webApp.expand();
+    }, 100);
   }
 }
 
