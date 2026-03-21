@@ -116,7 +116,7 @@ export default function Navbar() {
             className="flex items-center justify-center w-9 h-9 bg-cream-dark rounded-lg text-sm font-bold text-walnut"
             aria-label="Switch language"
           >
-            {language === "en" ? "ខ្មែ" : "EN"}
+            {language === "en" ? "ខ្មែរ" : "EN"}
           </button>
 
           {/* FIXED: Better touch target for menu button */}
