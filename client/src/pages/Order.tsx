@@ -9,6 +9,11 @@ import {
   showTelegramAlert,
   closeMiniApp,
 } from "@/lib/telegram";
+import {
+  PROMOTION,
+  isPromotionActive,
+  calculateDiscount,
+} from "@/lib/promotions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,6 +50,7 @@ interface OrderFormData {
   province: string;
   address: string;
   note: string;
+  logistics: string;
 }
 
 // Cambodia provinces (25 provinces + capital)
@@ -153,6 +159,12 @@ const DELIVERY_CONFIG = {
   provinceFee: 2.0, // $2.00 for other provinces
 };
 
+// Logistics companies for provinces outside Phnom Penh
+const LOGISTICS_COMPANIES = [
+  { id: "vet", name: "VET / វិរះ ប៊ុនថាំ", icon: "📦" },
+  { id: "jt", name: "J&T Express", icon: "📦" },
+];
+
 // Thank you messages (editable)
 const THANK_YOU_MESSAGES = {
   en: "Thank you! For supporting natural Khmer products. We already got your order. We will prepare package for delivery to you.",
@@ -185,6 +197,7 @@ export default function Order() {
     province: "",
     address: "",
     note: "",
+    logistics: "",
   });
   const [transactionImage, setTransactionImage] = useState<File | null>(null);
   const [transactionPreview, setTransactionPreview] = useState<string>("");
@@ -243,7 +256,8 @@ export default function Order() {
   };
 
   const deliveryFee = calculateDeliveryFee();
-  const totalAmount = subtotal + deliveryFee;
+  const discount = isPromotionActive() ? calculateDiscount(subtotal) : 0;
+  const totalAmount = subtotal - discount + deliveryFee;
   const isFreeDelivery = subtotal >= DELIVERY_CONFIG.freeDeliveryMinimum;
 
   // Get selected province name
@@ -333,6 +347,10 @@ export default function Order() {
             provinceName: getProvinceName(),
             address: formData.address,
             note: formData.note,
+            logistics: formData.logistics,
+            logisticsName:
+              LOGISTICS_COMPANIES.find(l => l.id === formData.logistics)
+                ?.name || "",
           },
           items: cart.map(item => ({
             id: item.product.id,
@@ -343,6 +361,8 @@ export default function Order() {
           })),
           subtotal: subtotal,
           deliveryFee: deliveryFee,
+          discount: discount,
+          discountPercent: isPromotionActive() ? PROMOTION.discountPercent : 0,
           isFreeDelivery: isFreeDelivery,
           total: totalAmount,
           currency: "USD",
@@ -823,6 +843,39 @@ export default function Order() {
             </select>
           </div>
 
+          {/* Logistics Company - Only show if NOT Phnom Penh */}
+          {formData.province && formData.province !== "phnom_penh" && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                {isKhmer ? "ក្រុមហ៊ុនដឹកជញ្ជូន *" : "Delivery Company *"}
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {LOGISTICS_COMPANIES.map(company => (
+                  <button
+                    key={company.id}
+                    type="button"
+                    onClick={() =>
+                      setFormData(prev => ({ ...prev, logistics: company.id }))
+                    }
+                    className={`p-4 rounded-xl border-2 text-center transition-all ${
+                      formData.logistics === company.id
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                        : "border-gray-200 bg-white hover:border-emerald-300"
+                    }`}
+                  >
+                    <span className="text-2xl block mb-1">{company.icon}</span>
+                    <span className="text-sm font-medium">{company.name}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">
+                {isKhmer
+                  ? "យើងនឹងផ្ញើកញ្ចប់តាមក្រុមហ៊ុនដឹកជញ្ជូនដែលអ្នកជ្រើសរើស"
+                  : "We will send your package via your selected delivery company"}
+              </p>
+            </div>
+          )}
+
           <div>
             <label className="text-sm font-medium text-gray-700">
               {isKhmer ? "អាសយដ្ឋានលម្អិត" : "Detailed Address"} *
@@ -907,7 +960,8 @@ export default function Order() {
           !formData.name ||
           !formData.phone ||
           !formData.province ||
-          !formData.address
+          !formData.address ||
+          (formData.province !== "phnom_penh" && !formData.logistics)
         }
         onClick={() => setStep("payment")}
       >
@@ -931,6 +985,16 @@ export default function Order() {
         <div className="w-20" />
       </div>
 
+      {/* Promotion Banner */}
+      {isPromotionActive() && (
+        <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white p-4 rounded-xl text-center">
+          <p className="font-bold text-lg">🎉 {PROMOTION.name[language]}</p>
+          <p className="text-sm opacity-90">
+            {PROMOTION.description[language]}
+          </p>
+        </div>
+      )}
+
       {/* Amount breakdown */}
       <Card className="bg-emerald-600 text-white border-0">
         <CardContent className="py-6 space-y-2">
@@ -938,6 +1002,17 @@ export default function Order() {
             <span>{isKhmer ? "តម្លៃផលិតផល" : "Subtotal"}</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
+
+          {/* Discount - Only show if promotion active */}
+          {isPromotionActive() && discount > 0 && (
+            <div className="flex justify-between text-yellow-300 text-sm font-medium">
+              <span className="flex items-center gap-1">
+                🎁 {PROMOTION.badge[language]}
+              </span>
+              <span>-${discount.toFixed(2)}</span>
+            </div>
+          )}
+
           <div className="flex justify-between text-emerald-100 text-sm">
             <span className="flex items-center gap-1">
               <Truck className="w-3 h-3" />

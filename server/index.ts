@@ -106,7 +106,15 @@ function generateOrderId(): string {
 
 // Format order message for staff group
 function formatOrderMessage(orderId: string, orderData: any): string {
-  const { customer, items, total, deliveryFee } = orderData;
+  const {
+    customer,
+    items,
+    total,
+    deliveryFee,
+    subtotal,
+    discount,
+    discountPercent,
+  } = orderData;
 
   const itemsList = items
     .map(
@@ -115,13 +123,24 @@ function formatOrderMessage(orderId: string, orderData: any): string {
     )
     .join("\n");
 
+  // Logistics info (show on delivery line if exists)
+  const logisticsInfo = customer.logisticsName
+    ? `(${customer.logisticsName})`
+    : "";
+
+  // Discount line (only show if there's a discount)
+  const discountLine =
+    discount && discount > 0
+      ? `🎁 <b>បញ្ចុះតម្លៃ(${discountPercent || 10}%):</b> -$${discount.toFixed(2)}\n`
+      : "";
+
   const message = `
 🛒 <b>ការបញ្ជាទិញថ្មី: ${orderId}</b>
 
 👤 <b>អតិថិជន:</b>
   ឈ្មោះ: ${customer.name}
   ទូរស័ព្ទ: ${customer.phone}
-  អាសយដ្ឋាន: ${customer.address}, ${customer.province || ""}
+  អាសយដ្ឋាន: ${customer.address}, ${customer.provinceName || customer.province || ""}
 
 💬 <b>Telegram:</b>
   ${customer.telegramUsername ? `@${customer.telegramUsername}` : "មិនមាន"}
@@ -131,8 +150,8 @@ function formatOrderMessage(orderId: string, orderData: any): string {
 📦 <b>ផលិតផល:</b>
 ${itemsList}
 
-🚚 <b>ថ្លៃដឹកជញ្ជូន:</b> $${deliveryFee?.toFixed(2) || "0.00"}
-💰 <b>សរុប:</b> $${total.toFixed(2)}
+🚚 <b>ថ្លៃដឹកជញ្ជូន${logisticsInfo}:</b> $${deliveryFee?.toFixed(2) || "0.00"}
+${discountLine}💰 <b>សរុប:</b> $${total.toFixed(2)}
 
 ⏰ ${new Date().toLocaleString("en-US", { timeZone: "Asia/Phnom_Penh" })}
 
@@ -327,14 +346,22 @@ async function startServer() {
         const orderId = generateOrderId();
         const staffMessage = formatOrderMessage(orderId, orderData);
 
-        await sendTelegramMessage(CONFIG.STAFF_GROUP_ID, staffMessage);
-
-        await sendTelegramPhoto(
-          CONFIG.STAFF_GROUP_ID,
-          transactionImage.buffer,
-          `📸 Receipt for order ${orderId}`
-        );
-
+        // Send order details to staff group (don't fail if network issue)
+        try {
+          await sendTelegramMessage(CONFIG.STAFF_GROUP_ID, staffMessage);
+          await sendTelegramPhoto(
+            CONFIG.STAFF_GROUP_ID,
+            transactionImage.buffer,
+            `📸 Receipt for order ${orderId}`
+          );
+          console.log("✅ Order sent to Telegram");
+        } catch (telegramError) {
+          console.log(
+            "⚠️ Telegram failed (will work on Railway):",
+            telegramError
+          );
+          // Continue - don't fail the order
+        }
         if (orderData.customer.telegramId) {
           const confirmMessage = formatConfirmationMessage(
             orderId,
