@@ -30,7 +30,7 @@ export interface Translations {
   products_clear_filters: string;
   products_inquire: string;
   products_view_details: string;
-  products_ask_telegram: string;
+  products_ask_facebook_sros: string;
 
   // Categories
   cat_all: string;
@@ -46,7 +46,7 @@ export interface Translations {
   detail_out_of_stock: string;
   detail_product_details: string;
   detail_ask_product: string;
-  detail_opens_telegram: string;
+  detail_opens_facebook_sros: string;
   detail_watch_video: string;
   detail_watch_on: string;
 
@@ -129,7 +129,7 @@ export const translations: Record<Language, Translations> = {
     products_clear_filters: "Clear Filters",
     products_inquire: "Inquire",
     products_view_details: "View details",
-    products_ask_telegram: "Ask on Telegram",
+    products_ask_facebook_sros: "Ask on Facebook",
 
     // Categories
     cat_all: "All Products",
@@ -145,8 +145,8 @@ export const translations: Record<Language, Translations> = {
     detail_out_of_stock: "Out of Stock",
     detail_product_details: "Product Details",
     detail_ask_product: "Ask About This Product",
-    detail_opens_telegram:
-      "Opens a chat on Telegram with product details pre-filled",
+    detail_opens_facebook_sros:
+      "Opens a chat on Facebook Page with product details pre-filled",
     detail_watch_video: "Watch Video",
     detail_watch_on: "Watch on",
 
@@ -201,7 +201,7 @@ export const translations: Record<Language, Translations> = {
 
     // Footer
     footer_rights: "All rights reserved.",
-    footer_telegram: "Telegram",
+    footer_telegram: "Mini-App",
     footer_products: "Products",
     footer_contact: "Contact",
 
@@ -235,7 +235,7 @@ export const translations: Record<Language, Translations> = {
     products_clear_filters: "សម្អាតតម្រង",
     products_inquire: "សាកសួរ",
     products_view_details: "មើលព័ត៌មាន",
-    products_ask_telegram: "សួរតាម Telegram",
+    products_ask_facebook_sros: "សួរតាម Facebook_Page",
 
     // Categories
     cat_all: "ផលិតផលទាំងអស់",
@@ -251,7 +251,8 @@ export const translations: Record<Language, Translations> = {
     detail_out_of_stock: "អស់ពីស្តុក",
     detail_product_details: "ព័ត៌មានលម្អិតផលិតផល",
     detail_ask_product: "សាកសួរអំពីផលិតផលនេះ",
-    detail_opens_telegram: "បើកការជជែកនៅ Telegram ជាមួយព័ត៌មានផលិតផល",
+    detail_opens_facebook_sros:
+      "សួរពត៍មានបន្ថែមនៃផលិតផលនេះតាមរយៈ Facebook Page",
     detail_watch_video: "មើលវីដេអូ",
     detail_watch_on: "មើលនៅ",
 
@@ -259,14 +260,14 @@ export const translations: Record<Language, Translations> = {
     about_badge: "របៀបដំណើរការ",
     about_title: "ទិញទំនិញងាយស្រួល",
     about_subtitle:
-      "គ្មានការបង់ប្រាក់ស្មុគស្មាញ។ គ្រាន់តែរកមើល សាកសួរ ហើយយើងនឹងដោះស្រាយនៅសល់។",
+      "គ្មានការបង់ប្រាក់ស្មុគស្មាញ។ គ្រាន់តែរកមើល សាកសួរ ធ្វើការបញ្ជាទិញយើងនឹងរៀបចំជូនអ្នក។",
     about_step1_title: "រកមើលផលិតផល",
     about_step1_desc: "រកមើលបណ្តុំផលិតផលដែលមានគុណភាពក្នុងប្រភេទផ្សេងៗ។",
     about_step2_title: "សាកសួរតាម Telegram",
     about_step2_desc: "ចុចប៊ូតុងសាកសួរលើផលិតផលណាមួយដើម្បីផ្ញើសារមកយើង។",
     about_step3_title: "ទទួលការបញ្ជាទិញ",
     about_step3_desc:
-      "យើងនឹងបញ្ជាក់ភាពអាចរកបាន រៀបចំការបង់ប្រាក់ និងដឹកជញ្ជូនយ៉ាងរហ័ស។",
+      "យើងនឹងបញ្ជាក់ពីការទទួលបានការកម្មង់របស់លោកអ្នក និងដឹកជញ្ជូនយ៉ាងរហ័ស។",
     about_cta_title: "ត្រៀមខ្លួនបញ្ជាទិញ?",
     about_cta_desc:
       "ផ្ញើសារមកយើងតាម Telegram ហើយយើងនឹងឆ្លើយតបក្នុងរយៈពេលប៉ុន្មាននាទី។",
@@ -277,13 +278,13 @@ export const translations: Record<Language, Translations> = {
     contact_title: "ទាក់ទងយើង",
     contact_subtitle: "ទាក់ទងតាមបណ្តាញណាមួយរបស់យើង។ យើងនៅទីនេះដើម្បីជួយ!",
     contact_telegram_title: "Telegram",
-    contact_telegram_desc: "ផ្ញើសារមកយើងដោយផ្ទាល់សម្រាប់ការបញ្ជាទិញ",
+    contact_telegram_desc: "ដាក់ការបញ្ជាទិញដោយផ្ទាល់ក្នុង Mini App",
     contact_facebook_title: "ទំព័រ Facebook",
     contact_facebook_desc: "តាមដានទំព័ររបស់យើងសម្រាប់ព័ត៌មានថ្មីៗ",
     contact_tiktok_title: "TikTok",
     contact_tiktok_desc: "មើលវីដេអូផលិតផល និងការវាយតម្លៃ",
     contact_instagram_title: "Instagram",
-    contact_instagram_desc: "មើលផលិតផលថ្មីៗ និងរឿងរ៉ាវ",
+    contact_instagram_desc: "តាមដានគណនីIGរបស់យើងមើលផលិតផលថ្មីៗ",
     contact_direct_title: "ទំនាក់ទំនងផ្ទាល់",
     contact_direct_desc:
       "សម្រាប់ការបញ្ជាទិញ និងសំណួរអាជីវកម្ម សូមទាក់ទងយើងតាម:",
@@ -303,7 +304,7 @@ export const translations: Record<Language, Translations> = {
 
     // Footer
     footer_rights: "រក្សាសិទ្ធិគ្រប់យ៉ាង។",
-    footer_telegram: "Telegram",
+    footer_telegram: "Mini-App",
     footer_products: "ផលិតផល",
     footer_contact: "ទំនាក់ទំនង",
 

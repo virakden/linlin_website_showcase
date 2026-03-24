@@ -45,7 +45,7 @@ export default function Footer() {
           {/* Nav Links */}
           <div className="flex items-center gap-6 text-sm">
             <a
-              href={`https://t.me/${STORE_CONFIG.telegramUsername}`}
+              href={STORE_CONFIG.telegramMiniApp}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"

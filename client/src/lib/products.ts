@@ -31,6 +31,7 @@ export interface Category {
   name: string;
   name_kh: string;
   icon: string;
+  playlist?: string | null; // Array of product IDs in this category, or null for dynamic
 }
 
 export const CATEGORIES: Category[] = [
@@ -39,22 +40,49 @@ export const CATEGORIES: Category[] = [
     name: "All Products",
     name_kh: "ផលិតផលទាំងអស់",
     icon: "LayoutGrid",
+    playlist: null,
   },
-  { id: "terkpley", name: "Terk-Pley", name_kh: "ទឹកពន្លៃ", icon: "Droplets" },
-  { id: "oil", name: "Body Oil", name_kh: "ប្រេងផ្កា", icon: "Flower2" },
-  { id: "scrub", name: "Scrub", name_kh: "ស្រ្កាប់ធម្មជាតិ", icon: "Sparkles" },
+  {
+    id: "terkpley",
+    name: "Terk-Pley",
+    name_kh: "ទឹកពន្លៃ",
+    icon: "Droplets",
+    playlist: "https://vt.tiktok.com/ZS9RPoeN68Bcs-H4pv3/",
+  },
+  {
+    id: "oil",
+    name: "Body Oil",
+    name_kh: "ប្រេងផ្កា",
+    icon: "Flower2",
+    playlist: "https://vt.tiktok.com/ZS9RPEwHPotg4-AhdBa/",
+  },
+  {
+    id: "scrub",
+    name: "Scrub",
+    name_kh: "ស្រ្កាប់ធម្មជាតិ",
+    icon: "Sparkles",
+    playlist: "https://vt.tiktok.com/ZS9RPoe99h94L-VwWDP/",
+  },
   {
     id: "lotion",
     name: "Lotion & Serum",
     name_kh: "ឡេ & សារ៉ូម",
     icon: "Milk",
+    playlist: "https://vt.tiktok.com/ZS9RPET3nnqJX-fc4NK/",
   },
-  { id: "mask", name: "Face Mask", name_kh: "ម៉ាសមុខ", icon: "Smile" },
+  {
+    id: "mask",
+    name: "Face Mask",
+    name_kh: "ម៉ាសមុខ",
+    icon: "Smile",
+    playlist: "https://vt.tiktok.com/ZS9RPEoEmm8W2-1mkCg/",
+  },
   {
     id: "turmeric",
     name: "Turmeric",
     name_kh: "រមៀតសូន & ម្សៅរមៀត",
     icon: "Leaf",
+    playlist: "https://vt.tiktok.com/ZS9RPEWnVeRJJ-YFzog/",
   },
 ];
 

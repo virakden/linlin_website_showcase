@@ -54,7 +54,7 @@ const SOCIAL_LINKS = [
     hoverColor: "hover:bg-[#229ED9]",
     getTitle: (t: any) => t.contact_telegram_title,
     getDesc: (t: any) => t.contact_telegram_desc,
-    getUrl: () => `https://t.me/+855969447146`,
+    getUrl: () => STORE_CONFIG.telegramMiniApp,
     canContact: true,
   },
   {
@@ -64,7 +64,7 @@ const SOCIAL_LINKS = [
     hoverColor: "hover:bg-[#166FE5]",
     getTitle: (t: any) => t.contact_facebook_title,
     getDesc: (t: any) => t.contact_facebook_desc,
-    getUrl: () => STORE_CONFIG.facebookPage,
+    getUrl: () => STORE_CONFIG.facebook,
     canContact: true,
   },
   {
@@ -185,17 +185,17 @@ export default function ContactSection() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={() =>
-                openTelegramPersonal("Hi! I'm interested in your products.")
-              }
+            <a
+              href={STORE_CONFIG.telegramChannel}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 flex items-center justify-center gap-2.5 px-5 py-3 bg-[#2AABEE] text-white rounded-xl font-semibold text-sm hover:bg-[#229ED9] transition-colors shadow-md"
             >
               <TelegramIcon className="w-5 h-5" />
               {t.contact_message_telegram}
-            </button>
+            </a>
             <a
-              href={STORE_CONFIG.facebookPage}
+              href={STORE_CONFIG.facebook}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 flex items-center justify-center gap-2.5 px-5 py-3 bg-[#1877F2] text-white rounded-xl font-semibold text-sm hover:bg-[#166FE5] transition-colors shadow-md"

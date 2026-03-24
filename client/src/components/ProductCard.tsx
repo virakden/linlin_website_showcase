@@ -6,7 +6,7 @@
 import { Product } from "@/lib/products";
 import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { openTelegramChat, hapticFeedback } from "@/lib/telegram";
+import { openExternalLink, hapticFeedback } from "@/lib/telegram";
 import { Send, Eye, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -22,6 +22,15 @@ interface ProductCardProps {
   onViewDetails: (product: Product) => void;
 }
 
+// Facebook SVG icon
+function FacebookIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
+
 export default function ProductCard({
   product,
   index,
@@ -35,10 +44,8 @@ export default function ProductCard({
   const handleInquiry = (e: React.MouseEvent) => {
     e.stopPropagation();
     hapticFeedback("medium");
-    openTelegramChat(
-      STORE_CONFIG.telegramUsername,
-      `Hi! I'm interested in: ${product.name} ($${product.price.toFixed(2)}). Is it available?`
-    );
+    openExternalLink(STORE_CONFIG.facebook_sros);
+    `សួស្ដី! ខ្ញុំចង់កម្មង់: ${product.name} ($${product.price.toFixed(2)})។ សូមផ្តល់ព័ត៌មានបន្ថែម។`;
   };
 
   const handleVideo = (e: React.MouseEvent) => {
@@ -90,7 +97,7 @@ export default function ProductCard({
             className="p-2.5 bg-white/95 rounded-xl shadow-lg hover:bg-white transition-colors"
             title={t.products_view_details}
           >
-            <Eye className="w-5 h-5 text-walnut" />
+            <Eye className="w-6 h-6 text-walnut" />
           </button>
           {product.videoLink && (
             <button
@@ -101,13 +108,13 @@ export default function ProductCard({
               <Play className="w-5 h-5 text-terracotta" />
             </button>
           )}
-          <button
+          {/* <button
             onClick={handleInquiry}
             className="p-2.5 bg-teal/95 rounded-xl shadow-lg hover:bg-teal transition-colors"
-            title={t.products_ask_telegram}
+            title={t.products_ask_facebook_sros}
           >
-            <Send className="w-5 h-5 text-white" />
-          </button>
+            <FacebookIcon className="w-5 h-5 text-white" />
+          </button> */}
         </div>
       </div>
 
@@ -128,7 +135,7 @@ export default function ProductCard({
             onClick={handleInquiry}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-teal/10 text-teal rounded-lg text-xs font-semibold hover:bg-teal hover:text-white transition-colors"
           >
-            <Send className="w-3.5 h-3.5" />
+            <FacebookIcon className="w-3.5 h-3.5" />
             {t.products_inquire}
           </button>
         </div>

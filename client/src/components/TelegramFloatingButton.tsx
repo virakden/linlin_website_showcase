@@ -5,7 +5,11 @@
  */
 
 import { STORE_CONFIG } from "@/lib/store-config";
-import { isTelegramWebApp, openTelegramPersonal } from "@/lib/telegram";
+import {
+  isTelegramWebApp,
+  openTelegramLink,
+  openTelegramChannel,
+} from "@/lib/telegram";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Send } from "lucide-react";
 import { motion } from "framer-motion";
@@ -28,7 +32,10 @@ export default function TelegramFloatingButton() {
       whileHover={{ scale: 1.08 }}
       whileTap={{ scale: 0.95 }}
       onClick={() =>
-        openTelegramPersonal("Hi! I'm interested in your products.")
+        openTelegramLink(
+          STORE_CONFIG.telegramChannel,
+          "Hi! I'd like to place an order."
+        )
       }
       className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-5 py-3.5 bg-[#2AABEE] text-white rounded-2xl shadow-xl hover:shadow-2xl transition-shadow font-semibold text-sm"
       aria-label="Message us on Telegram"

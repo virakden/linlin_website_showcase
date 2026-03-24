@@ -29,13 +29,24 @@ export const STORE_CONFIG = {
     qrImage: "/qr-payment.jpeg", // Place your QR image in public folder
   },
 
-  // Social Links - Replace with your real links
-  telegramUsername: "https://t.me/+855969447146",
-  telegramChannel: "https://t.me/Haosreylin", // Your Telegram channel
-  telegramMiniApp: "https://t.me/linlin_skincare_bot/shop", // Mini App link (set later)
-  facebookPage: "https://www.facebook.com/svdlin/", // Your Facebook page
-  tiktok: "https://www.tiktok.com/@eee_linn168", // Your TikTok
-  instagram: "https://www.instagram.com/eee_linn?igsh=MTlvZGY1Y2k4dDU2cQ==", // Your Instagram
+  // Telegram Links
+  telegramUsername: "linlin_skincare_bot",
+  telegramContact: "https://t.me/+855969447146",
+  telegramChannel: "https://t.me/Haosreylin",
+  telegramMiniApp: "https://t.me/linlin_skincare_bot/shop",
+
+  // Social Media
+  facebook: "https://www.facebook.com/profile.php?id=61556083836668",
+  tiktok: "https://www.tiktok.com/@eee_linn168",
+  instagram: "https://www.instagram.com/eee_linn?igsh=MTlvZGY1Y2k4dDU2cQ==",
+  facebook_sros: "https://www.facebook.com/profile.php?id=61556083836668",
+
+  // Website
+  website: "https://linlin-terkpley.up.railway.app",
+  shopUrl: "https://linlin-terkpley.up.railway.app/order",
+
+  // All Links
+  allLinks: "https://linkbio.co/HaoSreyLin",
 
   // Contact
   phone: "096 9447 146",

@@ -1,13 +1,13 @@
 /*
  * Design: "Bazaar Fresh" — Warm Marketplace
- * Product detail modal with bilingual text, video link, Telegram inquiry
+ * Product detail modal with bilingual text, Facebook inquiry, TikTok playlist
  */
 
-import { Product } from "@/lib/products";
+import { Product, CATEGORIES } from "@/lib/products";
 import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { openTelegramChat, hapticFeedback } from "@/lib/telegram";
-import { X, Send, Check, Package, Play, ExternalLink } from "lucide-react";
+import { hapticFeedback, openExternalLink } from "@/lib/telegram";
+import { X, Check, Package, Play, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 
@@ -20,6 +20,24 @@ const BADGE_STYLES: Record<string, string> = {
 interface ProductDetailModalProps {
   product: Product | null;
   onClose: () => void;
+}
+
+// Facebook SVG icon
+function FacebookIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
+
+// TikTok SVG icon
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+  );
 }
 
 export default function ProductDetailModal({
@@ -39,14 +57,28 @@ export default function ProductDetailModal({
     };
   }, [product]);
 
-  const handleInquiry = () => {
+  // Get TikTok playlist URL for this product's category
+  const getPlaylistUrl = (): string | null => {
+    if (!product) return null;
+    const category = CATEGORIES.find(c => c.id === product.category);
+    return category?.playlist || null;
+  };
+
+  const handleFacebookInquiry = () => {
     if (!product) return;
     hapticFeedback("medium");
-    openTelegramChat(
-      STORE_CONFIG.telegramUsername,
-      `Hi! I'd like to order: ${product.name} (${STORE_CONFIG.currencySymbol}${product.price.toFixed(2)}). Can you help me?`
-    );
+    openExternalLink(STORE_CONFIG.facebook);
   };
+
+  const handleTikTokPlaylist = () => {
+    const playlistUrl = getPlaylistUrl();
+    if (playlistUrl) {
+      hapticFeedback("medium");
+      openExternalLink(playlistUrl);
+    }
+  };
+
+  const playlistUrl = product ? getPlaylistUrl() : null;
 
   return (
     <AnimatePresence>
@@ -114,33 +146,14 @@ export default function ProductDetailModal({
                     : product.description}
                 </p>
 
-                {/* Stock + Video Link row */}
-                <div className="flex items-center gap-4 mb-5 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <Package className="w-4 h-4 text-teal" />
-                    <span className="text-sm font-medium text-teal">
-                      {product.inStock
-                        ? t.detail_in_stock
-                        : t.detail_out_of_stock}
-                    </span>
-                  </div>
-                  {product.videoLink && (
-                    <a
-                      href={product.videoLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-terracotta/10 text-terracotta rounded-lg text-sm font-semibold hover:bg-terracotta hover:text-white transition-colors"
-                    >
-                      <Play className="w-3.5 h-3.5" />
-                      {t.detail_watch_video}
-                      {product.videoSource && (
-                        <span className="text-xs opacity-75">
-                          ({product.videoSource})
-                        </span>
-                      )}
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  )}
+                {/* Stock status */}
+                <div className="flex items-center gap-2 mb-5">
+                  <Package className="w-4 h-4 text-teal" />
+                  <span className="text-sm font-medium text-teal">
+                    {product.inStock
+                      ? t.detail_in_stock
+                      : t.detail_out_of_stock}
+                  </span>
                 </div>
 
                 {/* Details list */}
@@ -167,16 +180,41 @@ export default function ProductDetailModal({
                   ) : null;
                 })()}
 
-                {/* CTA Button */}
-                <button
-                  onClick={handleInquiry}
-                  className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 bg-teal text-white rounded-xl font-semibold text-base hover:bg-teal-dark transition-colors shadow-lg hover:shadow-xl"
-                >
-                  <Send className="w-5 h-5" />
-                  {t.detail_ask_product}
-                </button>
+                {/* CTA Buttons - Two buttons side by side */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {/* Facebook Button */}
+                  <button
+                    onClick={handleFacebookInquiry}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 bg-[#1877F2] text-white rounded-xl font-semibold text-sm sm:text-base hover:bg-[#166FE5] transition-colors shadow-lg hover:shadow-xl"
+                  >
+                    <FacebookIcon className="w-5 h-5" />
+                    <span className="whitespace-nowrap">
+                      {language === "kh"
+                        ? "សាកសួរក្នុង Facebook"
+                        : "Ask on Facebook"}
+                    </span>
+                  </button>
+
+                  {/* TikTok Button - Only show if category has playlist */}
+                  {playlistUrl && (
+                    <button
+                      onClick={handleTikTokPlaylist}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 bg-black text-white rounded-xl font-semibold text-sm sm:text-base hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl"
+                    >
+                      <TikTokIcon className="w-5 h-5" />
+                      <span className="whitespace-nowrap">
+                        {language === "kh"
+                          ? "មើលវីដេអូ TikTok"
+                          : "Watch on TikTok"}
+                      </span>
+                    </button>
+                  )}
+                </div>
+
                 <p className="text-center text-xs text-walnut-light/70 mt-3">
-                  {t.detail_opens_telegram}
+                  {language === "kh"
+                    ? "ចុចដើម្បីសាកសួរ ឬមើលវីដេអូផលិតផល"
+                    : "Tap to inquire or watch product videos"}
                 </p>
               </div>
             </div>

@@ -160,15 +160,15 @@ export default function Navbar() {
           </button>
 
           {!isTg && (
-            <button
-              onClick={() =>
-                openTelegramPersonal("Hi! I'm interested in your products.")
-              }
+            <a
+              href={STORE_CONFIG.telegramChannel}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 bg-teal text-white rounded-xl text-sm font-semibold hover:bg-teal-dark transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
             >
               <Send className="w-4 h-4" />
               {t.nav_message_us}
-            </button>
+            </a>
           )}
         </div>
 

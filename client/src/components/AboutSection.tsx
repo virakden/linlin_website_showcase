@@ -5,7 +5,6 @@
 
 import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { openTelegramChat } from "@/lib/telegram";
 import { Search, MessageSquare, Package, Send } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -113,18 +112,15 @@ export default function AboutSection() {
           <p className="text-white/80 text-base mb-6 max-w-md mx-auto">
             {t.about_cta_desc}
           </p>
-          <button
-            onClick={() =>
-              openTelegramChat(
-                STORE_CONFIG.telegramUsername,
-                "Hi! I'd like to place an order."
-              )
-            }
-            className="inline-flex items-center gap-2.5 px-6 py-3 bg-white text-teal rounded-xl font-semibold text-sm hover:bg-cream transition-colors shadow-lg"
+          <a
+            href={STORE_CONFIG.telegramChannel}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2.5 px-6 py-3.5 bg-white/15 text-white rounded-xl font-semibold text-sm hover:bg-white/25 transition-colors backdrop-blur-sm border border-white/20"
           >
             <Send className="w-4 h-4" />
             {t.about_cta_button}
-          </button>
+          </a>
         </motion.div>
       </div>
     </section>
