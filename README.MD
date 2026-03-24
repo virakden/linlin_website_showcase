@@ -215,10 +215,10 @@ npm install
    - Update `server/index.ts` with your Telegram bot token
    - Update `client/src/lib/store-config.ts` with your store info
 
-4. **Run development server**
+4. **Run development front-end**
 
 ```bash
-npm run dev
+npm run dev | pnpm dev
 ```
 
 5. **Open in browser**
@@ -231,8 +231,9 @@ http://localhost:3000/order  # Mini App page
 ### Build for Production
 
 ```bash
-npm run build
+npm run build | pnpm build
 npm start
+npx tsx server/index.ts
 ```
 
 ---
