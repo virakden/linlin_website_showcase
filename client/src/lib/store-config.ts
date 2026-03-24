@@ -9,14 +9,14 @@ export const STORE_CONFIG = {
   name_kh: "លីនលីន ទឹកពន្លៃ",
 
   // Taglines
-  tagline: "Natural Khmer Skincare Products",
-  tagline_kh: "ផលិតផលថែរក្សាស្បែកធម្មជាតិខ្មែរ",
+  tagline: "LinLin Natural Healthy Skin",
+  tagline_kh: "លីនលីនឈុតថែសម្រស់ សាច់ចាំ",
 
   // Descriptions
   description:
-    "Discover our collection of natural skincare products made with traditional Khmer ingredients.",
+    "Guaranteed standard products without cutting agents or skin sensitivities for weak and thin skin, red veins, and white spots.",
   description_kh:
-    "រកឃើញបណ្តុំផលិតផលថែរក្សាស្បែកធម្មជាតិ ផលិតពីគ្រឿងផ្សំខ្មែរប្រពៃណី។",
+    "ធានាផលិតផលស្តង់ដារគ្មានជាតិកាត់ ឬប្រតិកម្មស្បែកសម្រាប់អ្នកស្បែកខ្សោយ នឹងស្តើងឡើយថែមទាំងព្យាបាលសសៃក្រហម នឹងសង្វារក្រហម ឬសរ",
 
   // Currency
   currency: "USD",

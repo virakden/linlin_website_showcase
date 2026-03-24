@@ -111,7 +111,7 @@ export const translations: Record<Language, Translations> = {
     nav_message_us: "Message Us",
 
     // Hero
-    hero_badge: "Shop with Confidence",
+    hero_badge: "Made in Cambodia",
     hero_title: "Discover Products You'll Love",
     hero_description:
       "Browse our curated collection and message us on Telegram to order. Fast replies, easy shopping.",
@@ -217,7 +217,7 @@ export const translations: Record<Language, Translations> = {
     nav_message_us: "ផ្ញើសារ",
 
     // Hero
-    hero_badge: "ទិញទំនិញដោយទំនុកចិត្ត",
+    hero_badge: "ផលិតផលកូនខ្មែរ",
     hero_title: "រកឃើញផលិតផលដែលអ្នកចូលចិត្ត",
     hero_description:
       "រកមើលផលិតផលរបស់យើង ហើយផ្ញើសារមកយើងតាម Telegram ដើម្បីបញ្ជាទិញ។ ឆ្លើយតបរហ័ស ទិញទំនិញងាយស្រួល។",
