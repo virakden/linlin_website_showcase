@@ -4,7 +4,7 @@
 
 A modern e-commerce showcase website with integrated Telegram Mini App for seamless product ordering. Built for LinLin Natural Cosmetic (លីនលីន ទឹកពន្លៃ), featuring bilingual support (Khmer/English), real-time order notifications, and a complete checkout flow.
 
-![LinLin Banner](./docs/images/banner.png)
+![LinLin Banner](./docs/images/banner.PNG)
 
 <!-- TODO: Add banner image (1200x630px recommended) -->
 
