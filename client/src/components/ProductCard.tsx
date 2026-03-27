@@ -9,6 +9,11 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { openExternalLink, hapticFeedback } from "@/lib/telegram";
 import { Send, Eye, Play } from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  PROMOTION,
+  isPromotionActive,
+  getPromotionBadge,
+} from "@/lib/promotions";
 
 const BADGE_STYLES: Record<string, string> = {
   new: "bg-teal text-white",
@@ -127,10 +132,35 @@ export default function ProductCard({
           {desc}
         </p>
         <div className="flex items-center justify-between">
-          <span className="font-display font-bold text-teal text-lg">
+          {/* <span className="font-display font-bold text-teal text-lg">
             {STORE_CONFIG.currencySymbol}
             {product.price.toFixed(2)}
-          </span>
+          </span> */}
+          {isPromotionActive() ? (
+            <div className="flex flex-col gap-0.5">
+              <span className="inline-block w-fit px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
+                {getPromotionBadge(language)}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-display font-bold text-red-500 text-lg">
+                  {STORE_CONFIG.currencySymbol}
+                  {(
+                    product.price *
+                    (1 - PROMOTION.discountPercent / 100)
+                  ).toFixed(2)}
+                </span>
+                <span className="text-xs text-walnut-light line-through">
+                  {STORE_CONFIG.currencySymbol}
+                  {product.price.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <span className="font-display font-bold text-teal text-lg">
+              {STORE_CONFIG.currencySymbol}
+              {product.price.toFixed(2)}
+            </span>
+          )}
           <button
             onClick={handleInquiry}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-teal/10 text-teal rounded-lg text-xs font-semibold hover:bg-teal hover:text-white transition-colors"

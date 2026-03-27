@@ -7,9 +7,14 @@ import { Product, CATEGORIES } from "@/lib/products";
 import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { hapticFeedback, openExternalLink } from "@/lib/telegram";
-import { X, Check, Package, Play, ExternalLink } from "lucide-react";
+import { X, Check, Package } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
+import {
+  PROMOTION,
+  isPromotionActive,
+  getPromotionBadge,
+} from "@/lib/promotions";
 
 const BADGE_STYLES: Record<string, string> = {
   new: "bg-teal text-white",
@@ -134,10 +139,35 @@ export default function ProductDetailModal({
                   <h2 className="font-display font-bold text-xl md:text-2xl text-walnut leading-tight">
                     {language === "kh" ? product.name_kh : product.name}
                   </h2>
-                  <span className="font-display font-bold text-xl md:text-2xl text-teal whitespace-nowrap">
+                  {/* <span className="font-display font-bold text-xl md:text-2xl text-teal whitespace-nowrap">
                     {STORE_CONFIG.currencySymbol}
                     {product.price.toFixed(2)}
-                  </span>
+                  </span> */}
+                  {isPromotionActive() ? (
+                    <div className="flex flex-col items-end gap-0.5">
+                      <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-md">
+                        {getPromotionBadge(language)}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-walnut-light line-through whitespace-nowrap">
+                          {STORE_CONFIG.currencySymbol}
+                          {product.price.toFixed(2)}
+                        </span>
+                        <span className="font-display font-bold text-xl md:text-2xl text-red-500 whitespace-nowrap">
+                          {STORE_CONFIG.currencySymbol}
+                          {(
+                            product.price *
+                            (1 - PROMOTION.discountPercent / 100)
+                          ).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="font-display font-bold text-xl md:text-2xl text-teal whitespace-nowrap">
+                      {STORE_CONFIG.currencySymbol}
+                      {product.price.toFixed(2)}
+                    </span>
+                  )}
                 </div>
 
                 <p className="text-walnut-light text-base leading-relaxed mb-4">

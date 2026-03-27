@@ -13,6 +13,9 @@ import {
   PROMOTION,
   isPromotionActive,
   calculateDiscount,
+  getPromotionBadge,
+  getPromotionName,
+  getPromotionDescription,
 } from "@/lib/promotions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -257,7 +260,8 @@ export default function Order() {
 
   const deliveryFee = calculateDeliveryFee();
   const discount = isPromotionActive() ? calculateDiscount(subtotal) : 0;
-  const totalAmount = subtotal - discount + deliveryFee;
+  const discountedSubtotal = subtotal - discount;
+  const totalAmount = discountedSubtotal + deliveryFee;
   const isFreeDelivery = subtotal >= DELIVERY_CONFIG.freeDeliveryMinimum;
 
   // Get selected province name
@@ -545,9 +549,29 @@ export default function Order() {
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
-                    <span className="text-lg font-bold text-emerald-700">
-                      ${product.price.toFixed(2)}
-                    </span>
+                    {isPromotionActive() ? (
+                      <div className="flex flex-col gap-0.5">
+                        <span className="inline-block w-fit px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
+                          {getPromotionBadge(language)}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-lg font-bold text-red-500">
+                            $
+                            {(
+                              product.price *
+                              (1 - PROMOTION.discountPercent / 100)
+                            ).toFixed(2)}
+                          </span>
+                          <span className="text-xs text-gray-400 line-through">
+                            ${product.price.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-lg font-bold text-emerald-700">
+                        ${product.price.toFixed(2)}
+                      </span>
+                    )}
 
                     {qty === 0 ? (
                       <Button
@@ -619,9 +643,16 @@ export default function Order() {
                   <p className="text-sm text-gray-500">
                     {isKhmer ? "សរុប" : "Subtotal"}
                   </p>
-                  <p className="text-lg font-bold text-emerald-700">
-                    ${subtotal.toFixed(2)}
-                  </p>
+                  <div>
+                    <p className="text-lg font-bold text-emerald-700">
+                      ${discountedSubtotal.toFixed(2)}
+                    </p>
+                    {isPromotionActive() && (
+                      <p className="text-xs text-gray-400 line-through">
+                        ${subtotal.toFixed(2)}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -680,9 +711,24 @@ export default function Order() {
                 <h3 className="font-medium text-gray-800 line-clamp-1">
                   {isKhmer ? item.product.name_kh : item.product.name}
                 </h3>
-                <p className="text-emerald-700 font-semibold">
-                  ${item.product.price.toFixed(2)}
-                </p>
+                {isPromotionActive() ? (
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-emerald-700 font-semibold">
+                      $
+                      {(
+                        item.product.price *
+                        (1 - PROMOTION.discountPercent / 100)
+                      ).toFixed(2)}
+                    </span>
+                    <span className="text-xs text-gray-400 line-through">
+                      ${item.product.price.toFixed(2)}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-emerald-700 font-semibold">
+                    ${item.product.price.toFixed(2)}
+                  </p>
+                )}
 
                 <div className="flex items-center gap-3 mt-2">
                   <Button
@@ -705,9 +751,45 @@ export default function Order() {
                     <Plus className="w-4 h-4" />
                   </Button>
 
-                  <span className="ml-auto font-bold text-gray-800">
-                    ${(item.product.price * item.quantity).toFixed(2)}
-                  </span>
+                  <div className="ml-auto text-right">
+                    {isPromotionActive() ? (
+                      <>
+                        <span className="font-bold text-gray-800">
+                          $
+                          {(
+                            item.product.price *
+                            (1 - PROMOTION.discountPercent / 100) *
+                            item.quantity
+                          ).toFixed(2)}
+                        </span>
+                        <p className="text-xs text-gray-400 line-through">
+                          ${(item.product.price * item.quantity).toFixed(2)}
+                        </p>
+                      </>
+                    ) : (
+                      <div className="ml-auto text-right">
+                        {isPromotionActive() ? (
+                          <>
+                            <span className="font-bold text-gray-800">
+                              $
+                              {(
+                                item.product.price *
+                                (1 - PROMOTION.discountPercent / 100) *
+                                item.quantity
+                              ).toFixed(2)}
+                            </span>
+                            <p className="text-xs text-gray-400 line-through">
+                              ${(item.product.price * item.quantity).toFixed(2)}
+                            </p>
+                          </>
+                        ) : (
+                          <span className="font-bold text-gray-800">
+                            ${(item.product.price * item.quantity).toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -729,6 +811,12 @@ export default function Order() {
             <span>{isKhmer ? "តម្លៃផលិតផល" : "Subtotal"}</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
+          {isPromotionActive() && (
+            <div className="flex justify-between text-red-500 text-sm font-medium">
+              <span>🎁 {getPromotionBadge(language)}</span>
+              <span>-${discount.toFixed(2)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-gray-600">
             <span className="flex items-center gap-1">
               <Truck className="w-4 h-4" />
@@ -748,8 +836,8 @@ export default function Order() {
             <span>{isKhmer ? "សរុប" : "Total"}</span>
             <span className="text-emerald-700">
               {isFreeDelivery
-                ? `$${subtotal.toFixed(2)}`
-                : `$${subtotal.toFixed(2)}+`}
+                ? `$${discountedSubtotal.toFixed(2)}`
+                : `$${discountedSubtotal.toFixed(2)}+`}
             </span>
           </div>
         </CardContent>
@@ -921,6 +1009,12 @@ export default function Order() {
             <span>{isKhmer ? "តម្លៃផលិតផល" : "Subtotal"}</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
+          {isPromotionActive() && (
+            <div className="flex justify-between text-red-500 text-sm font-medium">
+              <span>🎁 {getPromotionBadge(language)}</span>
+              <span>-${discount.toFixed(2)}</span>
+            </div>
+          )}
 
           <div className="flex justify-between text-gray-600">
             <span className="flex items-center gap-1">
@@ -988,9 +1082,9 @@ export default function Order() {
       {/* Promotion Banner */}
       {isPromotionActive() && (
         <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white p-4 rounded-xl text-center">
-          <p className="font-bold text-lg">🎉 {PROMOTION.name[language]}</p>
+          <p className="font-bold text-lg">{getPromotionName(language)}</p>
           <p className="text-sm opacity-90">
-            {PROMOTION.description[language]}
+            {getPromotionDescription(language)}
           </p>
         </div>
       )}
@@ -1007,7 +1101,7 @@ export default function Order() {
           {isPromotionActive() && discount > 0 && (
             <div className="flex justify-between text-yellow-300 text-sm font-medium">
               <span className="flex items-center gap-1">
-                🎁 {PROMOTION.badge[language]}
+                🎁 {getPromotionBadge(language)}
               </span>
               <span>-${discount.toFixed(2)}</span>
             </div>
