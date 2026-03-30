@@ -30,13 +30,6 @@
       fbq("init", "948288534364250"); // DL_BM
       fbq("track", "PageView");
     </script>
-    <noscript
-      ><img
-        height="1"
-        width="1"
-        style="display: none"
-        src="https://www.facebook.com/tr?id=915317731313099&ev=PageView&noscript=1"
-    /></noscript>
     <!-- End Meta Pixel Code -->
     <meta charset="UTF-8" />
     <meta
@@ -76,7 +69,29 @@
   </head>
 
   <body>
+    <!-- Meta Pixel noscript fallback (must be in body, not head) -->
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display: none"
+        src="https://www.facebook.com/tr?id=915317731313099&ev=PageView&noscript=1"
+    /></noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+``` --- ## What Changed — Only 1 Thing: ``` BEFORE:
+<noscript>
+  was inside
+  <head>
+    ❌ AFTER:
+    <noscript>
+      moved to
+      <body>
+        ✅
+      </body></noscript
+    >
+  </head></noscript
+>

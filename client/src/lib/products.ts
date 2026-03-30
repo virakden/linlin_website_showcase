@@ -503,6 +503,209 @@ export const PRODUCTS: Product[] = [
     image: "/products/turmeric/028.jpg",
     inStock: true,
   },
+  {
+    id: "prod-029",
+    name: "set mommy ✨Terk pley+body oil +mask small set + tnam Spong",
+    name_kh: "ឈុតម៉ាក់ៗកូនខ្ចី ទឹកពន្លៃ+ប្រេង + ម៉ាសឈុតតូច + ថ្នាំស្ពុង",
+    description: "This set focuses on helping the skin. And face mask",
+    description_kh:
+      "ឈុតនេះ ផ្តោតសំខាន់ជំនួយស្បែក ប្រើប្រេងទឹកពន្លៃចូលស្ពុង ឬ លាបរឹតសាច់ស្អាត សាច់ចាំ +ម៉ាសបិតមុខទាំង2ប្រភេទ",
+    price: 35.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/029.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-030",
+    name: "set natural for mommy and period day🩸",
+    name_kh:
+      "ឈុតម៉ាក់ៗកូនខ្ចី ឬមកខែសាច់ស កាកលាយទឹកគីឡូ+ ទឹកពន្លៃស្រស់1ដប + ប្រេង 1ដប",
+    description:
+      "Naturally brighter skin Gentle care, powerful brightening and healthier",
+    description_kh:
+      "ប្រើចូលស្ពុង ឬ ស្ទីមជំនួយស្បែកសភ្លឺថ្លា បំបាត់ក្រិន ដុះសាច់នៅក សសៃខ្ចី ឬ មានស្នាមអុជខ្មៅ យូរខែឆ្នាំ ស្បែកស្ងួត គ្រើមលាបឡេមិន ចូល មិនស",
+    price: 21.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/030.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-031",
+    name: "best seller set ! Terk pley 1L + body oil +kak pley 1kg",
+    name_kh: "ឈុតកាកលាយទឹក ១គីឡូ + ទឹកពន្លៃសុទ្ធ ១លីត្រ +ប្រេងផ្កា ១ដប",
+    description: "This set focuses on helping the skin.",
+    description_kh:
+      "ប្រើចូលស្ពុង ឬ ស្ទីមជំនួយស្បែកសភ្លឺថ្លា បំបាត់ក្រិន ដុះសាច់នៅក សសៃខ្ចី ឬ មានស្នាមអុជខ្មៅ យូរខែឆ្នាំ ស្បែកស្ងួត គ្រើមលាបឡេមិន ចូល មិនស",
+    price: 29.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/031.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-032",
+    name: "set on period day for brightening skin 🩸",
+    name_kh:
+      "ឈុតមកខែ ទឹកពន្លៃ+ ប្រេងផ្កា + ពន្លៃរមៀតសូនកែវតូច + ម្សៅរមៀតឆុងញាំតូច + ឡេលាបខ្លួនសឈូក  +ថែមសំឡី១ដុំ",
+    description:
+      "Naturally brighter skin Gentle care, powerful brightening and healthier",
+    description_kh:
+      "ឈុតសំរាប់មកខែថ្ងៃ ជំនួយស្បែកញាំពីខាងក្នុងផង ជំនួយសុខភាព ស្បែក សក់ក្រចក , ទឹកពន្លៃប្រេងលាបពីខាងក្រៅ + ឡេប្រើចុងក្រោយគេ សខ្លាំង",
+    price: 47.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/032.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-033",
+    name: "set natural for mommy and period day🩸",
+    name_kh:
+      "ឈុតសាច់ចាំ សាច់ស្អាតពេលមកខែ ទឹកពន្លៃ + ប្រេង + ម្សៅរមៀតឆុងញាំតូច 1",
+    description:
+      "Naturally brighter skin Gentle care, powerful brightening and healthier",
+    description_kh:
+      "ជូតប្រេង + ទឹកពន្លៃរាល់ថ្ងៃកំឡុងពេលមកខែ ស្បែកសមានសំណើមំត់ + ញាំម្សៅរមៀតសាច់ចាំពីខាងក្នុងមកខែអស់ៗ បាត់ឈឺចុកពោះ មុខបាត់មុន",
+    price: 18.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/033.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-034",
+    name: "set natural for mommy and period day🩸",
+    name_kh: "ឈុតម៉ាក់ៗកូនខ្ចី ឬមកខែ ទឹកពន្លៃធុង១លីត្រ + ប្រេងដបធំ",
+    description:
+      "Naturally brighter skin Gentle care, powerful brightening and healthier",
+    description_kh:
+      "ប្រើរាល់ថ្ងៃ ឬ ស្ទីមជំនួយស្បែកសភ្លឺថ្លា បំបាត់ក្រិន ដុះសាច់នៅក សសៃខ្ចី ឬ មានស្នាមអុជខ្មៅ យូរខែឆ្នាំ ស្បែកស្ងួត គ្រើមលាបឡេមិន ចូល មិនស",
+    price: 39.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/034.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-035",
+    name: "set natural for mommy and period day🩸",
+    name_kh:
+      "ឈុតម៉ាក់ៗកូនខ្ចី ឬមកខែថ្ងៃ ទឹកពន្លៃ១ដប +ប្រេងសង្វារ + ស្ក្រាប់មើមពន្លៃដោះគោ + ស្ក្រាប់កាហ្វេ + ថ្នាំស្ពុងចិនសែ",
+    description:
+      "Naturally brighter skin Gentle care, powerful brightening and healthier",
+    description_kh:
+      "ប្រើរាល់ថ្ងៃ ឬ ស្ទីមជំនួយស្បែកសភ្លឺថ្លា បំបាត់ក្រិន ដុះសាច់នៅក សសៃខ្ចី ឬ មានស្នាមអុជខ្មៅ យូរខែឆ្នាំ ស្បែកស្ងួត គ្រើមលាបឡេមិន ចូល មិនស",
+    price: 35.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/035.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-036",
+    name: "set natural for mommy and period day🩸",
+    name_kh:
+      "ថ្នាំស្ពុងចិនសែ សាច់ស្អាត ស្ពុងពេលអស់ខែ នឹង ស្ពុងសសៃខ្ចី សាច់ស្អាតខ្លាំង លាបឡេសលឿន",
+    description:
+      "Naturally brighter skin Gentle care, powerful brightening and healthier",
+    description_kh:
+      "ស្ពុងដើម្បីសម្រួលសរសៃឈាម, ជួយអោយសម្រស់ក្មេងជាងវ័យ សាច់ចាំ, ស្ពុងបញ្ចេញជាតិពុល ជាតិខ្លាញ់តាមញើស, កាត់បន្ថយបញ្ហា គ្រុនផ្ដាសាយ ឈឺក្បាលតឹងច្រមុះ វិលមុខ, បំបាត់ជាំ ឫសដូងវិល ឫដូងច្រមុះ ស្បែកភ្លឺថ្លា សាច់ចាំ ស្រឡះខ្លួន អារម្មណ៍ស្រស់ស្រាយ",
+    price: 5.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/036.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-037",
+    name: "set natural for mommy and period day🩸",
+    name_kh:
+      "ឈុតសាច់ចាំ សាច់ស្អាតពេលមកខែ ទឹកពន្លៃ + ប្រេង + ពន្លៃរមៀតសូនទឹកឃ្មុំកែវតូច",
+    description:
+      "Naturally brighter skin Gentle care, powerful brightening and healthier",
+    description_kh:
+      "ជូតប្រេង + ទឹកពន្លៃរាល់ថ្ងៃកំឡុងពេលមកខែ ស្បែកសមានសំណើមំត់ + ញាំពន្លៃេមៀតសូន ចាំពីខាងក្នុងមកខែអស់ៗ បាត់ឈឺចុកពោះ មុខបាត់មុន",
+    price: 21.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/037.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-038",
+    name: "set natural for mommy and period day🩸",
+    name_kh: "កាកពន្លៃលាយទឹក ១ធុង ១គីឡូ គ្រឿងផ្សំច្រើនមុខ",
+    description:
+      "Naturally brighter skin Gentle care, powerful brightening and healthier",
+    description_kh:
+      "មានគ្រឿងផ្សំ ពន្លៃក្រូចសើច ផ្លែឈើ ប្រទាល ១ធុង អាចប្រើត្រដុះខ្លួនពេលមកខែ 10នាទីសាច់សភ្លឺថ្លា ឬ ត្រដុះខ្លួនពេលស្ពុងស្ទីម ស្បែកខ្ចីញេញ ម៉ត់ខៃ",
+    price: 10.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/038.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-039",
+    name: "Set natural for dry skin and dark skin and skin berries ‼️",
+    name_kh:
+      "ឈុតព្យាបាលស្បែកស្តើង សសៃក្រហម សង្វារ ឡេ1+ ទឹកពន្លៃ+ ប្រេងផ្កា +ស្ក្រាប់មើមពន្លៃដោះគោ",
+    description:
+      "Naturally brighter skin Gentle care, powerful brightening and healthier",
+    description_kh:
+      "បើចង់បានស្បែកមាំមិនងាយបែកសង្វារ បំប៉ន់ស្បែកអោយសរក្រាស់ៗ បាត់សសៃ នឹងស្នាមអុជខ្មៅយូរឆ្នាំ មុនខ្នង ស្បែកខូច ជួយបណ្តុះកោសិកា ថ្មី សរហ៏សទាន់ចិត្ត",
+    price: 40.0,
+    currency: "USD",
+    category: "lotion",
+    image: "/products/lotion/039.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-040",
+    name: "body cream whitening x10",
+    name_kh:
+      "គ្រីមបំបុកសx10 លាយចូលឡេសឈូក សខ្លាំង បាត់ក្រិនខ្មៅ យកលាបក្រញ៉រដៃសស្មើ អាចលាយជាមួយឡេផ្សេងក៏បាន សរហ័ស",
+    description:
+      "Whitening booster cream x10 mixed with rose lotion. Strong brightening effect, helps reduce dark spots and rough skin.",
+    description_kh:
+      "គ្រីមបំបុកសx10 លាយចូលឡេសឈូក សខ្លាំង បាត់ក្រិនខ្មៅ យកលាបក្រញ៉រដៃសស្មើ អាចលាយជាមួយឡេផ្សេងក៏បាន សរហ័ស",
+    price: 10.0,
+    currency: "USD",
+    category: "lotion",
+    image: "/products/lotion/040.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-041",
+    name: "1 jar of rose lotion + whitening booster cream.",
+    name_kh: "ឡេសឈូក ១កំប៉ុង + គ្រីមបំបុកស",
+    description:
+      "Specially formulated for yellow-toned, dry, and damaged skin. Ideal for skin with strong or visible stretch marks and thinning texture. This nourishing lotion helps improve skin clarity, leaving it brighter with a soft pink glow.",
+    description_kh:
+      "ផ្តោតសំខាន់អ្នកស្បែកលឿង ស្បែកស្ងួត ឬ សង្វារ មានស្នាមខ្លាំង ឬ ស្តើងខ្លាំង អាចសាកឡេចិញ្ចឹមបំប៉ន់អោយ សថ្លា សឈូកបំបាត់សង្វារ នឹងសសៃក្រហម សបែបក្រាស់ៗ",
+    price: 30.0,
+    currency: "USD",
+    category: "lotion",
+    image: "/products/lotion/041.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-042",
+    name: "Set natural for dry skin and dark skin and skin berries ‼️",
+    name_kh:
+      "ឈុតស្អាតទាំងមុខ នឹងដងខ្លួន បែបធម្មជាតិ🍃 ទឹកពន្លៃ + ប្រេង + ម៉ាសឈុតតូច50ក្រាម",
+    description:
+      "Naturally brighter skin Gentle care, powerful brightening and healthier.",
+    description_kh:
+      "ឈុតនេះ ស្អាតពីមុខ ដល់ ចុងជើង 🍃 កំលុងពេលមករដូវ ឬ ប្រើប្រចាំថ្ងៃ",
+    price: 30.0,
+    currency: "USD",
+    category: "mask",
+    image: "/products/mask/042.jpg",
+    inStock: true,
+  },
 ];
 
 /*

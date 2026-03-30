@@ -235,9 +235,9 @@ export default function Order() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   // Calculate delivery fee
-  const calculateDeliveryFee = (): number => {
-    // Free delivery if subtotal >= $20
-    if (subtotal >= DELIVERY_CONFIG.freeDeliveryMinimum) {
+  const calculateDeliveryFee = (afterDiscount: number): number => {
+    // Free delivery if price AFTER discount >= $20
+    if (afterDiscount >= DELIVERY_CONFIG.freeDeliveryMinimum) {
       return 0;
     }
 
@@ -258,11 +258,12 @@ export default function Order() {
     return DELIVERY_CONFIG.provinceFee;
   };
 
-  const deliveryFee = calculateDeliveryFee();
   const discount = isPromotionActive() ? calculateDiscount(subtotal) : 0;
   const discountedSubtotal = subtotal - discount;
+  const isFreeDelivery =
+    discountedSubtotal >= DELIVERY_CONFIG.freeDeliveryMinimum;
+  const deliveryFee = calculateDeliveryFee(discountedSubtotal);
   const totalAmount = discountedSubtotal + deliveryFee;
-  const isFreeDelivery = subtotal >= DELIVERY_CONFIG.freeDeliveryMinimum;
 
   // Get selected province name
   const getProvinceName = (): string => {
@@ -447,7 +448,8 @@ export default function Order() {
     }
 
     if (showDetails) {
-      const remaining = DELIVERY_CONFIG.freeDeliveryMinimum - subtotal;
+      const remaining =
+        DELIVERY_CONFIG.freeDeliveryMinimum - discountedSubtotal;
       return (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
           <p className="text-amber-800">
@@ -641,7 +643,7 @@ export default function Order() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">
-                    {isKhmer ? "សរុប" : "Subtotal"}
+                    {isKhmer ? "សរុបរង" : "Subtotal"}
                   </p>
                   <div>
                     <p className="text-lg font-bold text-emerald-700">
@@ -833,7 +835,7 @@ export default function Order() {
             )}
           </div>
           <div className="flex justify-between text-lg font-bold border-t pt-3">
-            <span>{isKhmer ? "សរុប" : "Total"}</span>
+            <span>{isKhmer ? "សរុបរង" : "Total"}</span>
             <span className="text-emerald-700">
               {isFreeDelivery
                 ? `$${discountedSubtotal.toFixed(2)}`
