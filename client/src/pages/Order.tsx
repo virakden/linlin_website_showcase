@@ -385,6 +385,26 @@ export default function Order() {
 
       if (result.success) {
         setOrderId(result.orderId);
+
+        // 🎯 Meta Pixel Purchase Event
+        try {
+          if (typeof window !== "undefined" && (window as any).fbq) {
+            (window as any).fbq("track", "Purchase", {
+              value: totalAmount,
+              currency: "USD",
+              content_type: "product",
+              contents: cart.map(item => ({
+                id: item.product.id,
+                quantity: item.quantity,
+                item_price: item.product.price,
+              })),
+              num_items: totalItems,
+            });
+          }
+        } catch (e) {
+          console.log("Pixel tracking error:", e);
+        }
+
         setStep("success");
       } else {
         throw new Error(result.error || "Order failed");
