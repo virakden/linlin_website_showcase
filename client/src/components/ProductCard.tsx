@@ -12,7 +12,7 @@ import {
   PROMOTION,
   isPromotionActive,
   getPromotionBadge,
-  isCategoryInStock,
+  isProductInStock,
 } from "@/lib/promotions";
 import { motion } from "framer-motion";
 
@@ -157,15 +157,15 @@ export default function ProductCard({
           )}
           <button
             onClick={handleInquiry}
-            disabled={!isCategoryInStock(product.category)}
+            disabled={!isProductInStock(product.id, product.category)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors
     ${
-      !isCategoryInStock(product.category)
+      !isProductInStock(product.id, product.category)
         ? "bg-gray-200 text-gray-400 cursor-not-allowed"
         : "bg-teal/10 text-teal hover:bg-teal hover:text-white"
     }`}
           >
-            {!isCategoryInStock(product.category) ? (
+            {!isProductInStock(product.id, product.category) ? (
               <span>{language === "kh" ? "ដាច់ស្ដុក" : "Out of Stock"}</span>
             ) : (
               <>

@@ -16,7 +16,7 @@ import {
   getPromotionBadge,
   getPromotionName,
   getPromotionDescription,
-  isCategoryInStock,
+  isProductInStock,
 } from "@/lib/promotions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -546,7 +546,7 @@ export default function Order() {
                   <ProductBadge badge={product.badge} />
 
                   {/* Out of stock overlay */}
-                  {!isCategoryInStock(product.category) && (
+                  {!isProductInStock(product.id, product.category) && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <span className="px-3 py-1.5 bg-gray-800 text-white text-sm font-bold rounded-lg">
                         {isKhmer ? "ដាច់ស្ដុក" : "Out of Stock"}
@@ -554,18 +554,19 @@ export default function Order() {
                     </div>
                   )}
 
-                  {qty === 0 && isCategoryInStock(product.category) && (
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <Button
-                        size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700"
-                        onClick={() => addToCart(product)}
-                      >
-                        <Plus className="w-4 h-4 mr-1" />
-                        {isKhmer ? "បន្ថែម" : "Add"}
-                      </Button>
-                    </div>
-                  )}
+                  {qty === 0 &&
+                    isProductInStock(product.id, product.category) && (
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <Button
+                          size="sm"
+                          className="bg-emerald-600 hover:bg-emerald-700"
+                          onClick={() => addToCart(product)}
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          {isKhmer ? "បន្ថែម" : "Add"}
+                        </Button>
+                      </div>
+                    )}
                 </div>
 
                 {/* Product Info */}
@@ -608,17 +609,19 @@ export default function Order() {
                       <Button
                         size="sm"
                         className={`text-white ${
-                          !isCategoryInStock(product.category)
+                          !isProductInStock(product.id, product.category)
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-emerald-600 hover:bg-emerald-700"
                         }`}
                         onClick={() =>
-                          isCategoryInStock(product.category) &&
+                          isProductInStock(product.id, product.category) &&
                           addToCart(product)
                         }
-                        disabled={!isCategoryInStock(product.category)}
+                        disabled={
+                          !isProductInStock(product.id, product.category)
+                        }
                       >
-                        {!isCategoryInStock(product.category) ? (
+                        {!isProductInStock(product.id, product.category) ? (
                           <>{isKhmer ? "ដាច់ស្ដុក" : "Out of Stock"}</>
                         ) : (
                           <>

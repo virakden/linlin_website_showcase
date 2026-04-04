@@ -96,13 +96,25 @@ export const CATEGORY_STOCK: Record<string, boolean> = {
   terkpley: true,
   oil: true,
   scrub: true,
-  lotion: false, // ← OUT OF STOCK example
+  lotion: false,
   mask: true,
   turmeric: true,
 };
 
-// Helper function
+// Must be defined BEFORE isProductInStock below
 export function isCategoryInStock(categoryId: string): boolean {
-  if (!(categoryId in CATEGORY_STOCK)) return true; // default = in stock
+  if (!(categoryId in CATEGORY_STOCK)) return true;
   return CATEGORY_STOCK[categoryId];
+}
+
+export const IN_STOCK_PRODUCTS: string[] = [
+  "prod-040", // ← add product ID here to override category
+];
+
+export function isProductInStock(
+  productId: string,
+  categoryId: string
+): boolean {
+  if (IN_STOCK_PRODUCTS.includes(productId)) return true;
+  return isCategoryInStock(categoryId);
 }

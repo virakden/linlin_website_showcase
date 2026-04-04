@@ -504,7 +504,7 @@ export const PRODUCTS: Product[] = [
     inStock: true,
   },
   {
-    id: "prod-029",
+    id: "prod-042",
     name: "set mommy ✨Terk pley+body oil +mask small set + tnam Spong",
     name_kh: "ឈុតម៉ាក់ៗកូនខ្ចី ទឹកពន្លៃ+ប្រេង + ម៉ាសឈុតតូច + ថ្នាំស្ពុង",
     description: "This set focuses on helping the skin. And face mask",
@@ -513,7 +513,7 @@ export const PRODUCTS: Product[] = [
     price: 35.0,
     currency: "USD",
     category: "terkpley",
-    image: "/products/terkpley/029.jpg",
+    image: "/products/terkpley/042.jpg",
     inStock: true,
   },
   {
@@ -692,7 +692,7 @@ export const PRODUCTS: Product[] = [
     inStock: true,
   },
   {
-    id: "prod-042",
+    id: "prod-043",
     name: "Set natural for dry skin and dark skin and skin berries ‼️",
     name_kh:
       "ឈុតស្អាតទាំងមុខ នឹងដងខ្លួន បែបធម្មជាតិ🍃 ទឹកពន្លៃ + ប្រេង + ម៉ាសឈុតតូច50ក្រាម",
@@ -703,7 +703,7 @@ export const PRODUCTS: Product[] = [
     price: 30.0,
     currency: "USD",
     category: "mask",
-    image: "/products/mask/042.jpg",
+    image: "/products/mask/043.jpg",
     inStock: true,
   },
 ];
