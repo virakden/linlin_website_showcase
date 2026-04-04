@@ -7,13 +7,14 @@ import { Product } from "@/lib/products";
 import { STORE_CONFIG } from "@/lib/store-config";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { openExternalLink, hapticFeedback } from "@/lib/telegram";
-import { Send, Eye, Play } from "lucide-react";
-import { motion } from "framer-motion";
+import { Eye, Play } from "lucide-react";
 import {
   PROMOTION,
   isPromotionActive,
   getPromotionBadge,
+  isCategoryInStock,
 } from "@/lib/promotions";
+import { motion } from "framer-motion";
 
 const BADGE_STYLES: Record<string, string> = {
   new: "bg-teal text-white",
@@ -113,13 +114,6 @@ export default function ProductCard({
               <Play className="w-5 h-5 text-terracotta" />
             </button>
           )}
-          {/* <button
-            onClick={handleInquiry}
-            className="p-2.5 bg-teal/95 rounded-xl shadow-lg hover:bg-teal transition-colors"
-            title={t.products_ask_facebook_sros}
-          >
-            <FacebookIcon className="w-5 h-5 text-white" />
-          </button> */}
         </div>
       </div>
 
@@ -163,10 +157,22 @@ export default function ProductCard({
           )}
           <button
             onClick={handleInquiry}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-teal/10 text-teal rounded-lg text-xs font-semibold hover:bg-teal hover:text-white transition-colors"
+            disabled={!isCategoryInStock(product.category)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors
+    ${
+      !isCategoryInStock(product.category)
+        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+        : "bg-teal/10 text-teal hover:bg-teal hover:text-white"
+    }`}
           >
-            <FacebookIcon className="w-3.5 h-3.5" />
-            {t.products_inquire}
+            {!isCategoryInStock(product.category) ? (
+              <span>{language === "kh" ? "ដាច់ស្ដុក" : "Out of Stock"}</span>
+            ) : (
+              <>
+                <FacebookIcon className="w-3.5 h-3.5" />
+                {t.products_inquire}
+              </>
+            )}
           </button>
         </div>
       </div>

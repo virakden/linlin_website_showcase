@@ -16,6 +16,7 @@ import {
   getPromotionBadge,
   getPromotionName,
   getPromotionDescription,
+  isCategoryInStock,
 } from "@/lib/promotions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -544,8 +545,16 @@ export default function Order() {
                   />
                   <ProductBadge badge={product.badge} />
 
-                  {/* Quick add overlay */}
-                  {qty === 0 && (
+                  {/* Out of stock overlay */}
+                  {!isCategoryInStock(product.category) && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="px-3 py-1.5 bg-gray-800 text-white text-sm font-bold rounded-lg">
+                        {isKhmer ? "ដាច់ស្ដុក" : "Out of Stock"}
+                      </span>
+                    </div>
+                  )}
+
+                  {qty === 0 && isCategoryInStock(product.category) && (
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                       <Button
                         size="sm"
@@ -598,11 +607,25 @@ export default function Order() {
                     {qty === 0 ? (
                       <Button
                         size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                        onClick={() => addToCart(product)}
+                        className={`text-white ${
+                          !isCategoryInStock(product.category)
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-emerald-600 hover:bg-emerald-700"
+                        }`}
+                        onClick={() =>
+                          isCategoryInStock(product.category) &&
+                          addToCart(product)
+                        }
+                        disabled={!isCategoryInStock(product.category)}
                       >
-                        <Plus className="w-4 h-4 mr-1" />
-                        {isKhmer ? "បន្ថែម" : "Add"}
+                        {!isCategoryInStock(product.category) ? (
+                          <>{isKhmer ? "ដាច់ស្ដុក" : "Out of Stock"}</>
+                        ) : (
+                          <>
+                            <Plus className="w-4 h-4 mr-1" />
+                            {isKhmer ? "បន្ថែម" : "Add"}
+                          </>
+                        )}
                       </Button>
                     ) : (
                       <div className="flex items-center gap-2 bg-emerald-50 rounded-full px-2 py-1">

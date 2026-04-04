@@ -85,3 +85,24 @@ export function getDiscountedTotal(
   const discount = calculateDiscount(subtotal);
   return subtotal - discount + deliveryFee;
 }
+
+// ========================================
+// CATEGORY STOCK CONFIG - Easy to control!
+// ========================================
+// Set false = OUT OF STOCK for that category
+// Set true  = IN STOCK (normal)
+
+export const CATEGORY_STOCK: Record<string, boolean> = {
+  terkpley: true,
+  oil: true,
+  scrub: true,
+  lotion: false, // ← OUT OF STOCK example
+  mask: true,
+  turmeric: true,
+};
+
+// Helper function
+export function isCategoryInStock(categoryId: string): boolean {
+  if (!(categoryId in CATEGORY_STOCK)) return true; // default = in stock
+  return CATEGORY_STOCK[categoryId];
+}

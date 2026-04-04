@@ -6,25 +6,25 @@
 
 import { CATEGORIES } from "@/lib/products";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { motion } from "framer-motion";
 import {
   LayoutGrid,
   Milk,
-  Amphora,
-  Drama,
-  Egg,
-  Salad,
-  Refrigerator,
+  Droplets,
+  Flower2,
+  Sparkles,
+  Smile,
+  Leaf,
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   LayoutGrid: <LayoutGrid className="w-4 h-4 flex-shrink-0" />,
+  Droplets: <Droplets className="w-4 h-4 flex-shrink-0" />,
+  Flower2: <Flower2 className="w-4 h-4 flex-shrink-0" />,
+  Sparkles: <Sparkles className="w-4 h-4 flex-shrink-0" />,
   Milk: <Milk className="w-4 h-4 flex-shrink-0" />,
-  Amphora: <Amphora className="w-4 h-4 flex-shrink-0" />,
-  Drama: <Drama className="w-4 h-4 flex-shrink-0" />,
-  Egg: <Egg className="w-4 h-4 flex-shrink-0" />,
-  Salad: <Salad className="w-4 h-4 flex-shrink-0" />,
-  Refrigerator: <Refrigerator className="w-4 h-4 flex-shrink-0" />,
+  Smile: <Smile className="w-4 h-4 flex-shrink-0" />,
+  Leaf: <Leaf className="w-4 h-4 flex-shrink-0" />,
 };
 
 interface CategoryFilterProps {
