@@ -96,7 +96,7 @@ export const CATEGORY_STOCK: Record<string, boolean> = {
   terkpley: true,
   oil: true,
   scrub: true,
-  lotion: false,
+  lotion: true,
   mask: true,
   turmeric: true,
 };
@@ -108,7 +108,7 @@ export function isCategoryInStock(categoryId: string): boolean {
 }
 
 export const IN_STOCK_PRODUCTS: string[] = [
-  "prod-040", // ← add product ID here to override category
+  // "prod-040", // ← add product ID here to override category
 ];
 
 export function isProductInStock(
