@@ -33,7 +33,10 @@ import {
   X,
   Loader2,
   Truck,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
+import { usePagination } from "@/hooks/usePagination";
 import * as LucideIcons from "lucide-react";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
@@ -227,6 +230,13 @@ export default function Order() {
     selectedCategory === "all"
       ? PRODUCTS
       : PRODUCTS.filter(p => p.category === selectedCategory);
+
+  const {
+    paginatedData: pagedProducts,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+  } = usePagination(filteredProducts, selectedCategory);
 
   // Calculate subtotal (products only)
   const subtotal = cart.reduce(
@@ -528,7 +538,7 @@ export default function Order() {
 
       {/* Products grid - showcase style */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredProducts.map(product => {
+        {pagedProducts.map(product => {
           const qty = getQuantity(product.id);
           return (
             <motion.div
@@ -690,6 +700,42 @@ export default function Order() {
           );
         })}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-6 mb-2">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="p-2 rounded-xl border bg-white text-stone-700 disabled:opacity-30 hover:bg-stone-100 transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`w-9 h-9 rounded-xl text-sm font-semibold transition-colors
+          ${
+            currentPage === page
+              ? "bg-emerald-600 text-white shadow-sm"
+              : "border bg-white text-stone-700 hover:bg-stone-100"
+          }`}
+            >
+              {page}
+            </button>
+          ))}
+
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="p-2 rounded-xl border bg-white text-stone-700 disabled:opacity-30 hover:bg-stone-100 transition-colors"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
 
       {/* Empty state */}
       {filteredProducts.length === 0 && (

@@ -18,6 +18,8 @@ import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
 import { Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePagination } from "@/hooks/usePagination";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Home() {
   const { language, t } = useLanguage();
@@ -26,8 +28,9 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((p) => {
-      const matchesCategory = activeCategory === "all" || p.category === activeCategory;
+    return PRODUCTS.filter(p => {
+      const matchesCategory =
+        activeCategory === "all" || p.category === activeCategory;
       if (!searchQuery.trim()) return matchesCategory;
       const query = searchQuery.toLowerCase();
       const name = language === "kh" ? p.name_kh : p.name;
@@ -39,6 +42,13 @@ export default function Home() {
       return matchesCategory && matchesSearch;
     });
   }, [activeCategory, searchQuery, language]);
+
+  const {
+    paginatedData: pagedProducts,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+  } = usePagination(filteredProducts, `${activeCategory}-${searchQuery}`);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -86,7 +96,7 @@ export default function Home() {
               type="text"
               placeholder={t.products_search}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-10 py-2.5 bg-white border border-border rounded-xl text-sm text-walnut placeholder:text-walnut-light/60 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all"
             />
             {searchQuery && (
@@ -118,7 +128,7 @@ export default function Home() {
                 transition={{ duration: 0.3 }}
                 className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
               >
-                {filteredProducts.map((product, i) => (
+                {pagedProducts.map((product, i) => (
                   <ProductCard
                     key={product.id}
                     product={product}
@@ -155,6 +165,41 @@ export default function Home() {
               </motion.div>
             )}
           </AnimatePresence>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-10">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-xl border border-border bg-white text-walnut disabled:opacity-30 hover:bg-cream-dark transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-9 h-9 rounded-xl text-sm font-semibold transition-colors
+          ${
+            currentPage === page
+              ? "bg-teal text-white shadow-sm"
+              : "border border-border bg-white text-walnut hover:bg-cream-dark"
+          }`}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-xl border border-border bg-white text-walnut disabled:opacity-30 hover:bg-cream-dark transition-colors"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
