@@ -9,12 +9,13 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import {
   LayoutGrid,
-  Milk,
   Droplets,
   Flower2,
   Sparkles,
+  Milk,
   Smile,
   Leaf,
+  FlaskConical,
 } from "lucide-react";
 
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -25,6 +26,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Milk: <Milk className="w-4 h-4 flex-shrink-0" />,
   Smile: <Smile className="w-4 h-4 flex-shrink-0" />,
   Leaf: <Leaf className="w-4 h-4 flex-shrink-0" />,
+  FlaskConical: <FlaskConical className="w-4 h-4 flex-shrink-0" />,
 };
 
 interface CategoryFilterProps {

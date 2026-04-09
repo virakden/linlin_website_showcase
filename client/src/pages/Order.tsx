@@ -426,20 +426,22 @@ export default function Order() {
   const ProductBadge = ({
     badge,
   }: {
-    badge?: "new" | "popular" | "limited";
+    badge?: "new" | "popular" | "limited" | "coming-soon";
   }) => {
     if (!badge) return null;
 
-    const styles = {
+    const styles: Record<string, string> = {
       new: "bg-emerald-500 text-white",
       popular: "bg-orange-500 text-white",
       limited: "bg-gray-800 text-white",
+      "coming-soon": "bg-purple-500 text-white",
     };
 
-    const labels = {
+    const labels: Record<string, string> = {
       new: isKhmer ? "ថ្មី" : "NEW",
       popular: isKhmer ? "ពេញនិយម" : "POPULAR",
       limited: isKhmer ? "មានកំណត់" : "LIMITED",
+      "coming-soon": isKhmer ? "មកដល់ឆាប់ៗ" : "COMING SOON",
     };
 
     return (
@@ -543,18 +545,32 @@ export default function Order() {
                     alt={isKhmer ? product.name_kh : product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <ProductBadge badge={product.badge} />
+                  <ProductBadge
+                    badge={product.comingSoon ? "coming-soon" : product.badge}
+                  />
 
-                  {/* Out of stock overlay */}
-                  {!isProductInStock(product.id, product.category) && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="px-3 py-1.5 bg-gray-800 text-white text-sm font-bold rounded-lg">
-                        {isKhmer ? "ដាច់ស្ដុក" : "Out of Stock"}
+                  {/* Coming Soon overlay */}
+                  {product.comingSoon && (
+                    <div className="absolute inset-0 bg-purple-900/50 flex items-center justify-center">
+                      <span className="px-3 py-1.5 bg-purple-600 text-white text-sm font-bold rounded-lg">
+                        {isKhmer ? "មកដល់ឆាប់ៗ" : "Coming Soon"}
                       </span>
                     </div>
                   )}
 
+                  {/* Out of stock overlay - ONLY ONE, with !product.comingSoon */}
+                  {!product.comingSoon &&
+                    !isProductInStock(product.id, product.category) && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <span className="px-3 py-1.5 bg-gray-800 text-white text-sm font-bold rounded-lg">
+                          {isKhmer ? "ដាច់ស្ដុក" : "Out of Stock"}
+                        </span>
+                      </div>
+                    )}
+
+                  {/* Add button hover - ADD !product.comingSoon here! */}
                   {qty === 0 &&
+                    !product.comingSoon &&
                     isProductInStock(product.id, product.category) && (
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <Button
@@ -581,7 +597,12 @@ export default function Order() {
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
-                    {isPromotionActive() ? (
+                    {/* PRICE - Updated for Coming Soon */}
+                    {product.comingSoon ? (
+                      <span className="text-lg font-bold text-purple-600">
+                        ${Math.floor(product.price / 10)}x
+                      </span>
+                    ) : isPromotionActive() ? (
                       <div className="flex flex-col gap-0.5">
                         <span className="inline-block w-fit px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
                           {getPromotionBadge(language)}
@@ -605,7 +626,16 @@ export default function Order() {
                       </span>
                     )}
 
-                    {qty === 0 ? (
+                    {/* BUTTON - Updated for Coming Soon */}
+                    {product.comingSoon ? (
+                      <Button
+                        size="sm"
+                        className="bg-purple-100 text-purple-600 cursor-not-allowed hover:bg-purple-100"
+                        disabled
+                      >
+                        {isKhmer ? "មកដល់ឆាប់ៗ" : "Coming Soon"}
+                      </Button>
+                    ) : qty === 0 ? (
                       <Button
                         size="sm"
                         className={`text-white ${

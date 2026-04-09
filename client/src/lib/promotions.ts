@@ -99,6 +99,7 @@ export const CATEGORY_STOCK: Record<string, boolean> = {
   lotion: true,
   mask: true,
   turmeric: true,
+  serum: true,
 };
 
 // Must be defined BEFORE isProductInStock below
@@ -108,7 +109,7 @@ export function isCategoryInStock(categoryId: string): boolean {
 }
 
 export const IN_STOCK_PRODUCTS: string[] = [
-  // "prod-040", // ← add product ID here to override category
+  "prod-05", // ← add product ID here to override category
 ];
 
 export function isProductInStock(

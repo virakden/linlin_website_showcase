@@ -20,6 +20,7 @@ const BADGE_STYLES: Record<string, string> = {
   new: "bg-teal text-white",
   popular: "bg-terracotta text-white",
   limited: "bg-walnut text-white",
+  "coming-soon": "bg-purple-500 text-white",
 };
 
 interface ProductCardProps {
@@ -85,11 +86,19 @@ export default function ProductCard({
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
-        {product.badge && (
+        {(product.badge || product.comingSoon) && (
           <span
-            className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wide ${BADGE_STYLES[product.badge]}`}
+            className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wide ${
+              product.comingSoon
+                ? BADGE_STYLES["coming-soon"]
+                : BADGE_STYLES[product.badge || "new"]
+            }`}
           >
-            {product.badge}
+            {product.comingSoon
+              ? language === "kh"
+                ? "មកដល់ឆាប់ៗ"
+                : "Coming Soon"
+              : product.badge}
           </span>
         )}
 
@@ -126,11 +135,12 @@ export default function ProductCard({
           {desc}
         </p>
         <div className="flex items-center justify-between">
-          {/* <span className="font-display font-bold text-teal text-lg">
-            {STORE_CONFIG.currencySymbol}
-            {product.price.toFixed(2)}
-          </span> */}
-          {isPromotionActive() ? (
+          {product.comingSoon ? (
+            <span className="font-display font-bold text-purple-500 text-lg">
+              {STORE_CONFIG.currencySymbol}
+              {Math.floor(product.price / 10)}x
+            </span>
+          ) : isPromotionActive() ? (
             <div className="flex flex-col gap-0.5">
               <span className="inline-block w-fit px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
                 {getPromotionBadge(language)}
@@ -155,25 +165,31 @@ export default function ProductCard({
               {product.price.toFixed(2)}
             </span>
           )}
-          <button
-            onClick={handleInquiry}
-            disabled={!isProductInStock(product.id, product.category)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors
-    ${
-      !isProductInStock(product.id, product.category)
-        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-        : "bg-teal/10 text-teal hover:bg-teal hover:text-white"
-    }`}
-          >
-            {!isProductInStock(product.id, product.category) ? (
-              <span>{language === "kh" ? "ដាច់ស្ដុក" : "Out of Stock"}</span>
-            ) : (
-              <>
-                <FacebookIcon className="w-3.5 h-3.5" />
-                {t.products_inquire}
-              </>
-            )}
-          </button>
+          {product.comingSoon ? (
+            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-100 text-purple-600 cursor-not-allowed">
+              {language === "kh" ? "មកដល់ឆាប់ៗ" : "Coming Soon"}
+            </span>
+          ) : (
+            <button
+              onClick={handleInquiry}
+              disabled={!isProductInStock(product.id, product.category)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors
+              ${
+                !isProductInStock(product.id, product.category)
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-teal/10 text-teal hover:bg-teal hover:text-white"
+              }`}
+            >
+              {!isProductInStock(product.id, product.category) ? (
+                <span>{language === "kh" ? "ដាច់ស្ដុក" : "Out of Stock"}</span>
+              ) : (
+                <>
+                  <FacebookIcon className="w-3.5 h-3.5" />
+                  {t.products_inquire}
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </motion.div>

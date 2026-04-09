@@ -20,6 +20,7 @@ const BADGE_STYLES: Record<string, string> = {
   new: "bg-teal text-white",
   popular: "bg-terracotta text-white",
   limited: "bg-walnut text-white",
+  "coming-soon": "bg-purple-500 text-white",
 };
 
 interface ProductDetailModalProps {
@@ -124,11 +125,19 @@ export default function ProductDetailModal({
                   alt={language === "kh" ? product.name_kh : product.name}
                   className="w-full h-full object-cover"
                 />
-                {product.badge && (
+                {(product.badge || product.comingSoon) && (
                   <span
-                    className={`absolute top-4 left-4 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide ${BADGE_STYLES[product.badge]}`}
+                    className={`absolute top-4 left-4 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide ${
+                      product.comingSoon
+                        ? BADGE_STYLES["coming-soon"]
+                        : BADGE_STYLES[product.badge || "new"]
+                    }`}
                   >
-                    {product.badge}
+                    {product.comingSoon
+                      ? language === "kh"
+                        ? "មកដល់ឆាប់ៗ"
+                        : "Coming Soon"
+                      : product.badge}
                   </span>
                 )}
               </div>
@@ -139,11 +148,12 @@ export default function ProductDetailModal({
                   <h2 className="font-display font-bold text-xl md:text-2xl text-walnut leading-tight">
                     {language === "kh" ? product.name_kh : product.name}
                   </h2>
-                  {/* <span className="font-display font-bold text-xl md:text-2xl text-teal whitespace-nowrap">
-                    {STORE_CONFIG.currencySymbol}
-                    {product.price.toFixed(2)}
-                  </span> */}
-                  {isPromotionActive() ? (
+                  {product.comingSoon ? (
+                    <span className="font-display font-bold text-xl md:text-2xl text-purple-500 whitespace-nowrap">
+                      {STORE_CONFIG.currencySymbol}
+                      {Math.floor(product.price / 10)}x
+                    </span>
+                  ) : isPromotionActive() ? (
                     <div className="flex flex-col items-end gap-0.5">
                       <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-md">
                         {getPromotionBadge(language)}
@@ -178,11 +188,19 @@ export default function ProductDetailModal({
 
                 {/* Stock status */}
                 <div className="flex items-center gap-2 mb-5">
-                  <Package className="w-4 h-4 text-teal" />
-                  <span className="text-sm font-medium text-teal">
-                    {product.inStock
-                      ? t.detail_in_stock
-                      : t.detail_out_of_stock}
+                  <Package
+                    className={`w-4 h-4 ${product.comingSoon ? "text-purple-500" : "text-teal"}`}
+                  />
+                  <span
+                    className={`text-sm font-medium ${product.comingSoon ? "text-purple-500" : "text-teal"}`}
+                  >
+                    {product.comingSoon
+                      ? language === "kh"
+                        ? "មកដល់ឆាប់ៗ"
+                        : "Coming Soon"
+                      : product.inStock
+                        ? t.detail_in_stock
+                        : t.detail_out_of_stock}
                   </span>
                 </div>
 
@@ -210,34 +228,48 @@ export default function ProductDetailModal({
                   ) : null;
                 })()}
 
-                {/* CTA Buttons - Two buttons side by side */}
+                {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3">
-                  {/* Facebook Button */}
-                  <button
-                    onClick={handleFacebookInquiry}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 bg-[#1877F2] text-white rounded-xl font-semibold text-sm sm:text-base hover:bg-[#166FE5] transition-colors shadow-lg hover:shadow-xl"
-                  >
-                    <FacebookIcon className="w-5 h-5" />
-                    <span className="whitespace-nowrap">
-                      {language === "kh"
-                        ? "សាកសួរក្នុង Facebook"
-                        : "Ask on Facebook"}
-                    </span>
-                  </button>
-
-                  {/* TikTok Button - Only show if category has playlist */}
-                  {playlistUrl && (
+                  {product.comingSoon ? (
                     <button
-                      onClick={handleTikTokPlaylist}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 bg-black text-white rounded-xl font-semibold text-sm sm:text-base hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl"
+                      disabled
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 bg-purple-100 text-purple-600 rounded-xl font-semibold text-sm sm:text-base cursor-not-allowed"
                     >
-                      <TikTokIcon className="w-5 h-5" />
+                      <Package className="w-5 h-5" />
                       <span className="whitespace-nowrap">
-                        {language === "kh"
-                          ? "មើលវីដេអូ TikTok"
-                          : "Watch on TikTok"}
+                        {language === "kh" ? "មកដល់ឆាប់ៗ" : "Coming Soon"}
                       </span>
                     </button>
+                  ) : (
+                    <>
+                      {/* Facebook Button */}
+                      <button
+                        onClick={handleFacebookInquiry}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 bg-[#1877F2] text-white rounded-xl font-semibold text-sm sm:text-base hover:bg-[#166FE5] transition-colors shadow-lg hover:shadow-xl"
+                      >
+                        <FacebookIcon className="w-5 h-5" />
+                        <span className="whitespace-nowrap">
+                          {language === "kh"
+                            ? "សាកសួរក្នុង Facebook"
+                            : "Ask on Facebook"}
+                        </span>
+                      </button>
+
+                      {/* TikTok Button */}
+                      {playlistUrl && (
+                        <button
+                          onClick={handleTikTokPlaylist}
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 bg-black text-white rounded-xl font-semibold text-sm sm:text-base hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl"
+                        >
+                          <TikTokIcon className="w-5 h-5" />
+                          <span className="whitespace-nowrap">
+                            {language === "kh"
+                              ? "មើលវីដេអូ TikTok"
+                              : "Watch on TikTok"}
+                          </span>
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
 

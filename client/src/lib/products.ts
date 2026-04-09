@@ -18,12 +18,13 @@ export interface Product {
   currency: string;
   category: string;
   image: string;
-  badge?: "new" | "popular" | "limited";
+  badge?: "new" | "popular" | "limited" | "coming-soon";
   inStock: boolean;
+  comingSoon?: boolean;
   details?: string[];
   details_kh?: string[];
-  videoLink?: string; // TikTok, YouTube, or any video URL
-  videoSource?: string; // "TikTok" | "YouTube" | etc.
+  videoLink?: string;
+  videoSource?: string;
 }
 
 export interface Category {
@@ -65,8 +66,8 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: "lotion",
-    name: "Lotion & Serum",
-    name_kh: "ឡេ & សារ៉ូម",
+    name: "Lotion",
+    name_kh: "ឡេ",
     icon: "Milk",
     playlist: "https://vt.tiktok.com/ZS9RPET3nnqJX-fc4NK/",
   },
@@ -76,6 +77,13 @@ export const CATEGORIES: Category[] = [
     name_kh: "ម៉ាសមុខ",
     icon: "Smile",
     playlist: "https://vt.tiktok.com/ZS9RPEoEmm8W2-1mkCg/",
+  },
+  {
+    id: "serum",
+    name: "Serum & Cream",
+    name_kh: "សារ៉ូម & គ្រីម",
+    icon: "FlaskConical",
+    playlist: "https://vt.tiktok.com/ZS9RPET3nnqJX-fc4NK/",
   },
   {
     id: "turmeric",
@@ -673,8 +681,8 @@ export const PRODUCTS: Product[] = [
       "គ្រីមបំបុកសx10 លាយចូលឡេសឈូក សខ្លាំង បាត់ក្រិនខ្មៅ យកលាបក្រញ៉រដៃសស្មើ អាចលាយជាមួយឡេផ្សេងក៏បាន សរហ័ស",
     price: 10.0,
     currency: "USD",
-    category: "lotion",
-    image: "/products/lotion/040.jpg",
+    category: "serum",
+    image: "/products/serum/040.jpg",
     inStock: true,
   },
   {
@@ -705,6 +713,35 @@ export const PRODUCTS: Product[] = [
     category: "mask",
     image: "/products/mask/043.jpg",
     inStock: true,
+  },
+  {
+    id: "prod-044",
+    name: "body cream X body oil",
+    name_kh: "ប្រេងសង្វារដបតូច + គ្រីមបំបុកសx10",
+    description:
+      "Whitening booster mixed with lotion. Strong brightening effect, helps reduce dark spots and rough skin. Can be applied on elbows and knees to make skin even and smooth. Can also be mixed with other lotions. Fast results.",
+    description_kh:
+      "2មុខនេះជាផលិតផលលាយជាមួយឡេ ជំនួយអោយបាត់សសៃក្រហម នឹងសង្វារ + សលឿនឆាប់រហ័ស",
+    price: 16.0,
+    currency: "USD",
+    category: "serum",
+    image: "/products/serum/044.jpg",
+    inStock: true,
+  },
+  {
+    id: "prod-045",
+    name: "body serum milky booster",
+    name_kh: "ស្តេចសេរ៉ូមដោះគោ សរខ្លាំងx10 បាត់ស្នាមលឿន នឹង សង្វារ",
+    description:
+      "Whitening booster mixed with rose lotion. Strong brightening effect, helps reduce dark spots and rough skin. Can be applied on elbows and knees to make skin even and smooth. Can also be mixed with other lotions. Fast results.",
+    description_kh:
+      "ជាប្រភេទសេរ៉ូមជំនួយសថ្លា បាត់ស្នាមអុជខ្មៅលាយជាមួយឡេ ត្រជាក់ស្បែកខ្លាំង ជ្រាបចូលស្បែលឿនល្អមិនកក ឬ ស្អិត",
+    price: 10.0,
+    currency: "USD",
+    category: "serum",
+    image: "/products/serum/045.jpg",
+    comingSoon: true,
+    inStock: false,
   },
 ];
 
