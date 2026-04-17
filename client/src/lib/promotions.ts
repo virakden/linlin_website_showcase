@@ -11,7 +11,7 @@
 
 export const PROMOTION = {
   // ✅ Turn ON/OFF here
-  enabled: true,
+  enabled: false,
 
   // 💰 Discount percentage (10 = 10% off)
   discountPercent: 10,

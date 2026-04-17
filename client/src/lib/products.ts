@@ -165,7 +165,6 @@ export const PRODUCTS: Product[] = [
     currency: "USD",
     category: "oil",
     image: "/products/oil/005.jpg",
-    badge: "new",
     inStock: true,
   },
   {
@@ -740,8 +739,8 @@ export const PRODUCTS: Product[] = [
     currency: "USD",
     category: "serum",
     image: "/products/serum/045.jpg",
-    comingSoon: true,
-    inStock: false,
+    badge: "new",
+    inStock: true,
   },
 ];
 
