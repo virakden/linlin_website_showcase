@@ -32,6 +32,10 @@ const CONFIG = {
   INSTAGRAM_URL: "https://www.instagram.com/eee_linn?igsh=MTlvZGY1Y2k4dDU2cQ==",
   CONTACT_URL: "https://t.me/+855969447146",
   ALL_LINKS_URL: "https://linkbio.co/HaoSreyLin",
+
+  // ✅ ADD THESE 2 NEW LINES:
+  WIFE_USER_ID: 1004330498,
+  CHANNEL_USERNAME: "@Haosreylin",
 };
 
 // Configure multer for file uploads
@@ -267,17 +271,350 @@ async function handleLinksCommand(chatId: number) {
   await sendTelegramMessage(chatId, message, { reply_markup: keyboard });
 }
 
+/*
+ * ========================================
+ * CHANNEL AUTO-POST SCHEDULER
+ * Conversational flow with inline keyboards
+ * ========================================
+ */
+
+// Session states
+type PostState =
+  | "IDLE"
+  | "WAITING_MEDIA"
+  | "WAITING_TITLE_DECISION"
+  | "WAITING_TITLE"
+  | "WAITING_POST_DECISION"
+  | "WAITING_SCHEDULE_DATE"
+  | "WAITING_SCHEDULE_TIME";
+
+interface UserSession {
+  state: PostState;
+  fileId?: string;
+  mediaType?: "photo" | "video";
+  title?: string;
+  scheduleDate?: "today" | "tomorrow";
+}
+
+// Store session per user
+const userSessions = new Map<number, UserSession>();
+
+// Default caption template
+const buildCaption = (title?: string): string => {
+  const titleLine = title ? `${title}\n\n` : "";
+  return (
+    `${titleLine}` +
+    `——————————————————————\n` +
+    `🛒 កម្មង់តាមរយៈ "<a href="https://t.me/linlin_skincare_bot/shop">លីនលីនទឹកពន្លៃ Mini-App</a>" 🚚\n\n` +
+    `🚨 ព័ត៍មានបន្ថែម "<a href="https://t.me/linlin_skincare_bot">លីនលីនទឹកពន្លៃ bot</a>" 🤖\n` +
+    `📱 មើលឈុតថ្មីៗ តាមវេបសាយ "<a href="https://linlinterkpley.com">លីនលីនទឹកពន្លៃ Website</a>" 🔭\n` +
+    `——————————————————————`
+  );
+};
+
+// Answer callback query (dismiss button loading)
+async function answerCallbackQuery(callbackQueryId: string) {
+  await fetch(
+    `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/answerCallbackQuery`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ callback_query_id: callbackQueryId }),
+    }
+  );
+}
+
+// Send message with inline keyboard buttons
+async function sendInlineKeyboard(
+  chatId: number,
+  text: string,
+  buttons: Array<Array<{ text: string; callback_data: string }>>
+) {
+  return sendTelegramMessage(chatId, text, {
+    reply_markup: { inline_keyboard: buttons },
+  });
+}
+
+// Send photo to channel by file_id
+async function sendPhotoToChannel(fileId: string, caption: string) {
+  const url = `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: CONFIG.CHANNEL_USERNAME,
+      photo: fileId,
+      caption,
+      parse_mode: "HTML",
+    }),
+  });
+  return response.json();
+}
+
+// Send video to channel by file_id
+async function sendVideoToChannel(fileId: string, caption: string) {
+  const url = `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendVideo`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: CONFIG.CHANNEL_USERNAME,
+      video: fileId,
+      caption,
+      parse_mode: "HTML",
+    }),
+  });
+  return response.json();
+}
+
+// Post to channel immediately
+async function postToChannelNow(session: UserSession) {
+  const caption = buildCaption(session.title);
+  if (session.mediaType === "photo") {
+    await sendPhotoToChannel(session.fileId!, caption);
+  } else {
+    await sendVideoToChannel(session.fileId!, caption);
+  }
+}
+
+// Schedule post at specific time (Cambodia UTC+7)
+function scheduleChannelPost(
+  session: UserSession,
+  hour: number,
+  minute: number
+): number {
+  const now = new Date();
+  const target = new Date(now);
+
+  // Set target time in UTC (Cambodia = UTC+7, so subtract 7)
+  target.setUTCHours(hour - 7, minute, 0, 0);
+
+  // If tomorrow selected
+  if (session.scheduleDate === "tomorrow") {
+    target.setUTCDate(target.getUTCDate() + 1);
+  }
+
+  // If today but time already passed → push to next day
+  if (target.getTime() <= now.getTime()) {
+    target.setUTCDate(target.getUTCDate() + 1);
+  }
+
+  const delay = target.getTime() - now.getTime();
+
+  setTimeout(async () => {
+    try {
+      await postToChannelNow(session);
+      console.log(`✅ Scheduled post sent to ${CONFIG.CHANNEL_USERNAME}`);
+    } catch (err) {
+      console.error("❌ Scheduled post failed:", err);
+    }
+  }, delay);
+
+  return Math.round(delay / 60000); // return minutes remaining
+}
+
+/*
+ * Handle message updates from wife (text + media)
+ */
+async function handleSchedulerMessage(message: any) {
+  const userId: number = message.from?.id;
+  const chatId: number = message.chat.id;
+
+  if (userId !== CONFIG.WIFE_USER_ID) return;
+
+  const session: UserSession = userSessions.get(userId) || { state: "IDLE" };
+
+  // ── /postmedia command ──
+  if (message.text === "/postmedia") {
+    userSessions.set(userId, { state: "WAITING_MEDIA" });
+    await sendTelegramMessage(chatId, "📸 សូមផ្ញើរូបភាព ឬវីឌីអូ");
+    return;
+  }
+
+  // ── Receive photo or video ──
+  if ((message.photo || message.video) && session.state === "WAITING_MEDIA") {
+    const fileId = message.photo
+      ? message.photo[message.photo.length - 1].file_id
+      : message.video.file_id;
+    const mediaType: "photo" | "video" = message.photo ? "photo" : "video";
+
+    userSessions.set(userId, {
+      state: "WAITING_TITLE_DECISION",
+      fileId,
+      mediaType,
+    });
+
+    await sendInlineKeyboard(chatId, "✅ បានទទួល!\n\nតើមានចំណងជើងទេ?", [
+      [
+        { text: "✅ បាទ/ចាស", callback_data: "title_yes" },
+        { text: "❌ ទេ", callback_data: "title_no" },
+      ],
+    ]);
+    return;
+  }
+
+  // ── Receive short title text ──
+  if (message.text && session.state === "WAITING_TITLE") {
+    const title = message.text.trim();
+    userSessions.set(userId, {
+      ...session,
+      state: "WAITING_POST_DECISION",
+      title,
+    });
+
+    await sendInlineKeyboard(
+      chatId,
+      `📝 ចំណងជើង: <b>${title}</b>\n\nតើអ្នកចង់ផុសក្នុងឆាណែនឥឡូវនេះ ឬ កាលវិភាគ?`,
+      [
+        [
+          { text: "🚀 ផុសឥឡូវ", callback_data: "post_now" },
+          { text: "🗓 ផុសកាលវិភាគ", callback_data: "post_schedule" },
+        ],
+      ]
+    );
+    return;
+  }
+
+  // ── Receive schedule time (HH:MM) ──
+  if (message.text && session.state === "WAITING_SCHEDULE_TIME") {
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/;
+    if (!timeRegex.test(message.text.trim())) {
+      await sendTelegramMessage(
+        chatId,
+        "⚠️ ម៉ោងមិនត្រឹមត្រូវ!\nសូមវាយ format: <code>HH:MM</code>\nឧទាហរណ៍: <code>18:30</code>"
+      );
+      return;
+    }
+
+    const [hour, minute] = message.text.trim().split(":").map(Number);
+    const delayMinutes = scheduleChannelPost(session, hour, minute);
+    const dateLabel =
+      session.scheduleDate === "tomorrow" ? "ថ្ងៃស្អែក" : "ថ្ងៃនេះ";
+
+    userSessions.delete(userId);
+
+    await sendTelegramMessage(
+      chatId,
+      `🎉 បានកំណត់ Post ជោគជ័យ!\n\n` +
+        `📅 ថ្ងៃ: <b>${dateLabel}</b>\n` +
+        `⏰ ម៉ោង: <b>${message.text.trim()}</b> (ម៉ោងខ្មែរ)\n` +
+        `⏳ នៅសល់: <b>~${delayMinutes} នាទី</b>\n` +
+        `📢 Channel: ${CONFIG.CHANNEL_USERNAME}`
+    );
+    return;
+  }
+}
+
+/*
+ * Handle button click callbacks from wife
+ */
+async function handleCallbackQuery(callbackQuery: any) {
+  const userId: number = callbackQuery.from.id;
+  const chatId: number = callbackQuery.message.chat.id;
+  const data: string = callbackQuery.data;
+
+  if (userId !== CONFIG.WIFE_USER_ID) return;
+
+  await answerCallbackQuery(callbackQuery.id);
+
+  const session = userSessions.get(userId);
+  if (!session) return;
+
+  // ── Has title? YES ──
+  if (data === "title_yes" && session.state === "WAITING_TITLE_DECISION") {
+    userSessions.set(userId, { ...session, state: "WAITING_TITLE" });
+    await sendTelegramMessage(chatId, "✏️ សូមវាយចំណងជើង (Short Title):");
+    return;
+  }
+
+  // ── Has title? NO ──
+  if (data === "title_no" && session.state === "WAITING_TITLE_DECISION") {
+    userSessions.set(userId, {
+      ...session,
+      state: "WAITING_POST_DECISION",
+      title: undefined,
+    });
+    await sendInlineKeyboard(
+      chatId,
+      "តើអ្នកចង់ផុសក្នុងឆាណែនឥឡូវនេះ ឬ កាលវិភាគ?",
+      [
+        [
+          { text: "🚀 ផុសឥឡូវ", callback_data: "post_now" },
+          { text: "🗓 ផុសកាលវិភាគ", callback_data: "post_schedule" },
+        ],
+      ]
+    );
+    return;
+  }
+
+  // ── Post NOW ──
+  if (data === "post_now" && session.state === "WAITING_POST_DECISION") {
+    try {
+      await postToChannelNow(session);
+      userSessions.delete(userId);
+      await sendTelegramMessage(
+        chatId,
+        `✅ បានផុសទៅ ${CONFIG.CHANNEL_USERNAME} ជោគជ័យ! 🎉`
+      );
+    } catch {
+      await sendTelegramMessage(chatId, "❌ មានបញ្ហា! សូមព្យាយាមម្តងទៀត");
+    }
+    return;
+  }
+
+  // ── Post SCHEDULE → ask date ──
+  if (data === "post_schedule" && session.state === "WAITING_POST_DECISION") {
+    userSessions.set(userId, { ...session, state: "WAITING_SCHEDULE_DATE" });
+    await sendInlineKeyboard(chatId, "📅 សូមជ្រើសរើសថ្ងៃ:", [
+      [
+        { text: "📅 ថ្ងៃនេះ", callback_data: "date_today" },
+        { text: "📅 ថ្ងៃស្អែក", callback_data: "date_tomorrow" },
+      ],
+    ]);
+    return;
+  }
+
+  // ── Date selected → ask time ──
+  if (
+    (data === "date_today" || data === "date_tomorrow") &&
+    session.state === "WAITING_SCHEDULE_DATE"
+  ) {
+    const dateChoice = data === "date_today" ? "today" : "tomorrow";
+    const dateLabel = dateChoice === "today" ? "ថ្ងៃនេះ" : "ថ្ងៃស្អែក";
+    userSessions.set(userId, {
+      ...session,
+      state: "WAITING_SCHEDULE_TIME",
+      scheduleDate: dateChoice,
+    });
+    await sendTelegramMessage(
+      chatId,
+      `📅 ជ្រើស: <b>${dateLabel}</b>\n\n⏰ សូមវាយម៉ោង (ម៉ោងខ្មែរ):\nFormat: <code>HH:MM</code>\nឧទាហរណ៍: <code>18:30</code>`
+    );
+    return;
+  }
+}
+
 // Process incoming bot message
 async function processBotUpdate(update: any) {
   try {
-    const message = update.message;
-    if (!message || !message.text) return;
+    // ✅ Handle button clicks from wife
+    if (update.callback_query) {
+      await handleCallbackQuery(update.callback_query);
+      return;
+    }
 
+    const message = update.message;
+    if (!message) return;
+
+    // ✅ Handle scheduler flow from wife
+    await handleSchedulerMessage(message);
+
+    // Handle regular bot commands
+    if (!message.text) return;
     const chatId = message.chat.id;
     const text = message.text;
     const firstName = message.from?.first_name || "";
 
-    // Handle commands
     if (text === "/start" || text.startsWith("/start ")) {
       await handleStartCommand(chatId, firstName);
     } else if (text === "/shop") {
