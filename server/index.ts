@@ -288,10 +288,14 @@ type PostState =
   | "WAITING_SCHEDULE_DATE"
   | "WAITING_SCHEDULE_TIME";
 
+interface MediaItem {
+  fileId: string;
+  type: "photo" | "video";
+}
+
 interface UserSession {
   state: PostState;
-  fileId?: string;
-  mediaType?: "photo" | "video";
+  mediaItems?: MediaItem[];
   title?: string;
   scheduleDate?: "today" | "tomorrow";
 }
@@ -367,13 +371,50 @@ async function sendVideoToChannel(fileId: string, caption: string) {
   return response.json();
 }
 
+// Buffer to collect media group items (Telegram sends them as separate messages)
+interface MediaGroupBuffer {
+  items: MediaItem[];
+  userId: number;
+  chatId: number;
+  timer: ReturnType<typeof setTimeout>;
+}
+const mediaGroupBuffers = new Map<string, MediaGroupBuffer>();
+
+// Send multiple photos/videos to channel as album
+async function sendMediaGroupToChannel(items: MediaItem[], caption: string) {
+  const media = items.map((item, index) => ({
+    type: item.type,
+    media: item.fileId,
+    ...(index === 0 && { caption, parse_mode: "HTML" }), // caption on first item only
+  }));
+
+  const url = `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMediaGroup`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: CONFIG.CHANNEL_USERNAME,
+      media,
+    }),
+  });
+  return response.json();
+}
+
 // Post to channel immediately
 async function postToChannelNow(session: UserSession) {
   const caption = buildCaption(session.title);
-  if (session.mediaType === "photo") {
-    await sendPhotoToChannel(session.fileId!, caption);
+  const items = session.mediaItems || [];
+
+  if (items.length === 1) {
+    // Single item
+    if (items[0].type === "photo") {
+      await sendPhotoToChannel(items[0].fileId, caption);
+    } else {
+      await sendVideoToChannel(items[0].fileId, caption);
+    }
   } else {
-    await sendVideoToChannel(session.fileId!, caption);
+    // Multiple items → send as album
+    await sendMediaGroupToChannel(items, caption);
   }
 }
 
@@ -432,24 +473,67 @@ async function handleSchedulerMessage(message: any) {
   }
 
   // ── Receive photo or video ──
+  // NEW — handles single AND media group (album)
   if ((message.photo || message.video) && session.state === "WAITING_MEDIA") {
     const fileId = message.photo
       ? message.photo[message.photo.length - 1].file_id
       : message.video.file_id;
-    const mediaType: "photo" | "video" = message.photo ? "photo" : "video";
+    const type: "photo" | "video" = message.photo ? "photo" : "video";
+    const mediaGroupId: string | undefined = message.media_group_id;
 
-    userSessions.set(userId, {
-      state: "WAITING_TITLE_DECISION",
-      fileId,
-      mediaType,
-    });
+    if (mediaGroupId) {
+      // Part of an album — collect all items
+      const existing = mediaGroupBuffers.get(mediaGroupId);
 
-    await sendInlineKeyboard(chatId, "✅ បានទទួល!\n\nតើមានចំណងជើងទេ?", [
-      [
-        { text: "✅ បាទ/ចាស", callback_data: "title_yes" },
-        { text: "❌ ទេ", callback_data: "title_no" },
-      ],
-    ]);
+      if (existing) {
+        clearTimeout(existing.timer);
+        existing.items.push({ fileId, type });
+      } else {
+        mediaGroupBuffers.set(mediaGroupId, {
+          items: [{ fileId, type }],
+          userId,
+          chatId,
+          timer: null as any,
+        });
+      }
+
+      const buffer = mediaGroupBuffers.get(mediaGroupId)!;
+
+      // Wait 1.5s for all group messages to arrive, then process
+      buffer.timer = setTimeout(async () => {
+        mediaGroupBuffers.delete(mediaGroupId);
+        const collectedItems = buffer.items;
+
+        userSessions.set(userId, {
+          state: "WAITING_TITLE_DECISION",
+          mediaItems: collectedItems,
+        });
+
+        await sendInlineKeyboard(
+          chatId,
+          `✅ បានទទួល ${collectedItems.length} ឯកសារ!\n\nតើមានចំណងជើងទេ?`,
+          [
+            [
+              { text: "✅ បាទ/ចាស", callback_data: "title_yes" },
+              { text: "❌ ទេ", callback_data: "title_no" },
+            ],
+          ]
+        );
+      }, 1500);
+    } else {
+      // Single photo or video
+      userSessions.set(userId, {
+        state: "WAITING_TITLE_DECISION",
+        mediaItems: [{ fileId, type }],
+      });
+
+      await sendInlineKeyboard(chatId, "✅ បានទទួល!\n\nតើមានចំណងជើងទេ?", [
+        [
+          { text: "✅ បាទ/ចាស", callback_data: "title_yes" },
+          { text: "❌ ទេ", callback_data: "title_no" },
+        ],
+      ]);
+    }
     return;
   }
 
