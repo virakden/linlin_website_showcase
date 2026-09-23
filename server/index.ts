@@ -14,9 +14,8 @@ const __dirname = path.dirname(__filename);
  */
 const CONFIG = {
   // Telegram Bot Configuration
-  TELEGRAM_BOT_TOKEN:
-    process.env.TELEGRAM_BOT_TOKEN ||
-    "7921762858:AAHViLHA1loKZ-HPFQHSkSxND-rNanw2wjs",
+  TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN || "",
+  TELEGRAM_WEBHOOK_SECRET: process.env.TELEGRAM_WEBHOOK_SECRET || "",
   STAFF_GROUP_ID: process.env.STAFF_GROUP_ID || "-1003667649677",
 
   // Business Info
@@ -739,6 +738,15 @@ async function startServer() {
 
   // Telegram webhook endpoint
   app.post("/api/telegram/webhook", async (req, res) => {
+    if (
+      CONFIG.TELEGRAM_WEBHOOK_SECRET &&
+      req.header("X-Telegram-Bot-Api-Secret-Token") !==
+        CONFIG.TELEGRAM_WEBHOOK_SECRET
+    ) {
+      res.sendStatus(401);
+      return;
+    }
+
     try {
       await processBotUpdate(req.body);
       res.json({ ok: true });
@@ -855,9 +863,17 @@ async function startServer() {
     if (process.env.NODE_ENV === "production") {
       const webhookUrl = `${CONFIG.WEBSITE_URL}/api/telegram/webhook`;
       try {
-        const response = await fetch(
-          `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/setWebhook?url=${webhookUrl}`
+        const setWebhookUrl = new URL(
+          `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/setWebhook`
         );
+        setWebhookUrl.searchParams.set("url", webhookUrl);
+        if (CONFIG.TELEGRAM_WEBHOOK_SECRET) {
+          setWebhookUrl.searchParams.set(
+            "secret_token",
+            CONFIG.TELEGRAM_WEBHOOK_SECRET
+          );
+        }
+        const response = await fetch(setWebhookUrl);
         const result = await response.json();
         console.log("Webhook set:", result);
       } catch (error) {
