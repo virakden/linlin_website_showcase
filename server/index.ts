@@ -3,6 +3,7 @@ import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import multer from "multer";
+import { startAdsReportScheduler } from "./adsReport";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -858,6 +859,8 @@ async function startServer() {
 ║   Staff Group: ${CONFIG.STAFF_GROUP_ID}
 ╚════════════════════════════════════════════╝
     `);
+
+    startAdsReportScheduler();
 
     // Set Telegram webhook (only in production)
     if (process.env.NODE_ENV === "production") {
