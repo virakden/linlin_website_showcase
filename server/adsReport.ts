@@ -29,6 +29,7 @@ const ADS = {
   THREAD_ID: process.env.ADS_REPORT_THREAD_ID || "", // optional, forum topics
   META_TOKEN: process.env.META_ACCESS_TOKEN || "",
   GRAPH: process.env.META_GRAPH_VERSION || "v21.0",
+  TRIGGER_KEY: process.env.ADS_REPORT_KEY || "",
   TZ: "Asia/Phnom_Penh",
 };
 
@@ -40,51 +41,24 @@ const ACCOUNTS: Array<{ id: string; page: string }> = [
 
 type Period = "daily" | "cycle" | "monthly";
 
-interface MetaAction {
-  action_type: string;
-  value: string;
-}
-interface Insight {
-  spend?: string;
-  actions?: MetaAction[];
-  action_values?: MetaAction[];
-}
+interface MetaAction { action_type: string; value: string }
+interface Insight { spend?: string; actions?: MetaAction[]; action_values?: MetaAction[] }
 
 interface PageRow {
-  page: string;
-  purchases: number;
-  messages: number;
-  spend: number;
-  revenue: number;
-  failed: boolean;
+  page: string; purchases: number; messages: number;
+  spend: number; revenue: number; failed: boolean;
 }
 
 /* ─────────────────────────── dates (Cambodia) ─────────────────────────── */
 
-const MON = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 /** Cambodia-local calendar date, regardless of the server's own timezone. */
 function ppParts(offsetDays = 0) {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() + offsetDays);
   const iso = new Intl.DateTimeFormat("en-CA", {
-    timeZone: ADS.TZ,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
+    timeZone: ADS.TZ, year: "numeric", month: "2-digit", day: "2-digit",
   }).format(d);
   const [year, month, day] = iso.split("-");
   return { iso, day, month, year, mon: MON[Number(month) - 1] };
@@ -98,21 +72,14 @@ const isLastDayOfMonth = () => ppParts(0).month !== ppParts(1).month;
 /** Cambodia-local YYYY-MM-DD for any timestamp Meta returns. */
 function toPPDate(ts: string): string {
   return new Intl.DateTimeFormat("en-CA", {
-    timeZone: ADS.TZ,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
+    timeZone: ADS.TZ, year: "numeric", month: "2-digit", day: "2-digit",
   }).format(new Date(ts));
 }
 
 /* ──────────────────────────── Meta Graph API ──────────────────────────── */
 
 /** Messenger purchases — what Ads Manager shows as "Meta Purchase". */
-const PURCHASE_TYPES = [
-  "onsite_conversion.purchase",
-  "omni_purchase",
-  "purchase",
-];
+const PURCHASE_TYPES = ["onsite_conversion.purchase", "omni_purchase", "purchase"];
 
 /** Conversations started — the "Messenger" count. Meta names this
  *  differently across accounts, so try the known variants in order. */
@@ -125,16 +92,13 @@ const MESSAGE_TYPES = [
 function pickFirst(list: MetaAction[] | undefined, types: string[]): number {
   if (!list) return 0;
   for (const t of types) {
-    const hit = list.find(a => a.action_type === t);
+    const hit = list.find((a) => a.action_type === t);
     if (hit) return Number(hit.value) || 0;
   }
   return 0;
 }
 
-async function graph(
-  path: string,
-  params: Record<string, string>
-): Promise<any> {
+async function graph(path: string, params: Record<string, string>): Promise<any> {
   const url = new URL(`https://graph.facebook.com/${ADS.GRAPH}/${path}`);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
   url.searchParams.set("access_token", ADS.META_TOKEN);
@@ -151,12 +115,7 @@ async function fetchPage(
   until: string
 ): Promise<PageRow> {
   const base: PageRow = {
-    page: acct.page,
-    purchases: 0,
-    messages: 0,
-    spend: 0,
-    revenue: 0,
-    failed: false,
+    page: acct.page, purchases: 0, messages: 0, spend: 0, revenue: 0, failed: false,
   };
   try {
     const json = await graph(`act_${acct.id}/insights`, {
@@ -165,7 +124,7 @@ async function fetchPage(
       time_range: JSON.stringify({ since, until }),
     });
     const row: Insight | undefined = json.data?.[0];
-    if (!row) return base; // no delivery in this window
+    if (!row) return base;                    // no delivery in this window
     return {
       page: acct.page,
       purchases: pickFirst(row.actions, PURCHASE_TYPES),
@@ -185,10 +144,7 @@ async function fetchPage(
  * This is what makes the cycle report follow the 7-day rescheduling habit
  * instead of a fixed weekday.
  */
-async function campaignsEndingToday(): Promise<{
-  ending: boolean;
-  since: string;
-}> {
+async function campaignsEndingToday(): Promise<{ ending: boolean; since: string }> {
   const today = ppParts(0).iso;
   let earliest: string | null = null;
   let ending = false;
@@ -217,11 +173,7 @@ async function campaignsEndingToday(): Promise<{
 /* ───────────────────────────── formatting ─────────────────────────────── */
 
 const money = (n: number) =>
-  "$" +
-  n.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function buildMessage(period: Period, label: string, rows: PageRow[]): string {
   const lines: string[] = [];
@@ -274,17 +226,14 @@ async function sendToAdsGroup(text: string): Promise<void> {
     body: JSON.stringify(body),
   });
   const json = (await res.json()) as { ok: boolean; description?: string };
-  if (!json.ok)
-    throw new Error(`Telegram rejected the message: ${json.description}`);
+  if (!json.ok) throw new Error(`Telegram rejected the message: ${json.description}`);
 }
 
 /* ──────────────────────────────── public ──────────────────────────────── */
 
 export async function sendAdsReport(period: Period): Promise<void> {
   if (!ADS.BOT_TOKEN || !ADS.GROUP_ID || !ADS.META_TOKEN) {
-    console.error(
-      "❌ [adsReport] missing TELEGRAM_BOT_TOKEN, ADS_REPORT_GROUP_ID or META_ACCESS_TOKEN"
-    );
+    console.error("❌ [adsReport] missing TELEGRAM_BOT_TOKEN, ADS_REPORT_GROUP_ID or META_ACCESS_TOKEN");
     return;
   }
 
@@ -305,9 +254,7 @@ export async function sendAdsReport(period: Period): Promise<void> {
     label = `${today.mon} ${today.year}`;
   }
 
-  const rows = await Promise.all(
-    ACCOUNTS.map(a => fetchPage(a, since, today.iso))
-  );
+  const rows = await Promise.all(ACCOUNTS.map((a) => fetchPage(a, since, today.iso)));
 
   try {
     await sendToAdsGroup(buildMessage(period, label, rows));
@@ -317,43 +264,77 @@ export async function sendAdsReport(period: Period): Promise<void> {
   }
 }
 
+/**
+ * HTTP trigger. Railway can sleep an idle service, and node-cron never fires
+ * while the process is asleep — so an external cron service calls this URL
+ * instead. The request itself wakes the service, then the report sends.
+ *
+ *   GET /api/ads-report?key=<ADS_REPORT_KEY>&period=daily|cycle|monthly
+ *
+ * period=cycle still checks whether a campaign actually ends today and skips
+ * if not, so it is safe to call every night.
+ */
+export async function handleAdsReportRequest(req: any, res: any): Promise<void> {
+  const key = String(req.query?.key || "");
+  if (!ADS.TRIGGER_KEY || key !== ADS.TRIGGER_KEY) {
+    res.status(403).json({ ok: false, error: "forbidden" });
+    return;
+  }
+
+  const raw = String(req.query?.period || "daily");
+  const period: Period =
+    raw === "cycle" ? "cycle" : raw === "monthly" ? "monthly" : "daily";
+
+  if (period === "cycle") {
+    const { ending } = await campaignsEndingToday();
+    if (!ending) {
+      res.json({ ok: true, skipped: "no campaign ends today" });
+      return;
+    }
+  }
+  if (period === "monthly" && !isLastDayOfMonth()) {
+    res.json({ ok: true, skipped: "not the last day of the month" });
+    return;
+  }
+
+  await sendAdsReport(period);
+  res.json({ ok: true, sent: period });
+}
+
+/** Posts one line to the group at boot, so a deploy proves the wiring works. */
+export async function pingAdsGroup(): Promise<void> {
+  if (!ADS.GROUP_ID || !ADS.BOT_TOKEN) return;
+  const now = new Intl.DateTimeFormat("en-GB", {
+    timeZone: ADS.TZ, dateStyle: "medium", timeStyle: "short",
+  }).format(new Date());
+  try {
+    await sendToAdsGroup(`🟢 <b>Ads report service started</b>\n${now} (Cambodia)\nDaily 22:00 · Boost-end 23:00 · Monthly 23:30`);
+    console.log("✅ [adsReport] startup ping delivered");
+  } catch (err) {
+    console.error("❌ [adsReport] startup ping failed:", err);
+  }
+}
+
 export function startAdsReportScheduler(): void {
   if (!ADS.GROUP_ID) {
-    console.warn(
-      "⚠️  [adsReport] ADS_REPORT_GROUP_ID not set — scheduler idle"
-    );
+    console.warn("⚠️  [adsReport] ADS_REPORT_GROUP_ID not set — scheduler idle");
     return;
   }
 
   // 22:00 — every night, today's numbers.
-  cron.schedule("0 22 * * *", () => void sendAdsReport("daily"), {
-    timezone: ADS.TZ,
-  });
+  cron.schedule("0 22 * * *", () => void sendAdsReport("daily"), { timezone: ADS.TZ });
 
   // 23:00 — end-of-boost review, only on a night when a campaign ends today.
-  cron.schedule(
-    "0 23 * * *",
-    async () => {
-      const { ending } = await campaignsEndingToday();
-      if (ending) await sendAdsReport("cycle");
-      else
-        console.log(
-          "ℹ️  [adsReport] no campaign ends today — skipping cycle report"
-        );
-    },
-    { timezone: ADS.TZ }
-  );
+  cron.schedule("0 23 * * *", async () => {
+    const { ending } = await campaignsEndingToday();
+    if (ending) await sendAdsReport("cycle");
+    else console.log("ℹ️  [adsReport] no campaign ends today — skipping cycle report");
+  }, { timezone: ADS.TZ });
 
   // 23:30 — only on the last day of the month.
-  cron.schedule(
-    "30 23 * * *",
-    async () => {
-      if (isLastDayOfMonth()) await sendAdsReport("monthly");
-    },
-    { timezone: ADS.TZ }
-  );
+  cron.schedule("30 23 * * *", async () => {
+    if (isLastDayOfMonth()) await sendAdsReport("monthly");
+  }, { timezone: ADS.TZ });
 
-  console.log(
-    `✅ [adsReport] armed → group ${ADS.GROUP_ID} | daily 22:00, boost-end review 23:00, monthly 23:30 (${ADS.TZ})`
-  );
+  console.log(`✅ [adsReport] armed → group ${ADS.GROUP_ID} | daily 22:00, boost-end review 23:00, monthly 23:30 (${ADS.TZ})`);
 }

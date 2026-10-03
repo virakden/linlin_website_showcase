@@ -3,7 +3,7 @@ import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import multer from "multer";
-import { startAdsReportScheduler } from "./adsReport";
+import { startAdsReportScheduler, handleAdsReportRequest, pingAdsGroup, sendAdsReport } from "./adsReport";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -707,6 +707,25 @@ async function processBotUpdate(update: any) {
       await handleContactCommand(chatId);
     } else if (text === "/links") {
       await handleLinksCommand(chatId);
+    } else if (text.startsWith("/report")) {
+      // /report | /report cycle | /report monthly
+      // Also matches /report@botname, which is how groups deliver commands.
+      const arg = text.replace(/^\/report(@\S+)?/, "").trim().toLowerCase();
+      const period =
+        arg === "cycle" || arg === "week" || arg === "weekly"
+          ? "cycle"
+          : arg === "month" || arg === "monthly"
+            ? "monthly"
+            : "daily";
+
+      await sendTelegramMessage(chatId, `⏳ Building the ${period} report…`);
+      try {
+        await sendAdsReport(period);
+        await sendTelegramMessage(chatId, "✅ Sent to the ads report group.");
+      } catch (err) {
+        console.error("❌ /report failed:", err);
+        await sendTelegramMessage(chatId, "❌ Report failed. Check the Railway logs.");
+      }
     }
   } catch (error) {
     console.error("Error processing bot update:", error);
@@ -733,6 +752,9 @@ async function startServer() {
    */
 
   // Health check
+  // Ads report — called by an external cron so it works even if Railway sleeps
+  app.get("/api/ads-report", handleAdsReportRequest);
+
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
@@ -861,6 +883,7 @@ async function startServer() {
     `);
 
     startAdsReportScheduler();
+    void pingAdsGroup();
 
     // Set Telegram webhook (only in production)
     if (process.env.NODE_ENV === "production") {
