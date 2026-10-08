@@ -94,7 +94,7 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
-export const PRODUCTS: Product[] = [
+const PRODUCT_LIST: Product[] = [
   {
     id: "prod-001",
     name: "Turmeric Liquid (1L) + Stretch Mark Oil Set",
@@ -532,7 +532,7 @@ export const PRODUCTS: Product[] = [
       "Naturally brighter skin Gentle care, powerful brightening and healthier",
     description_kh:
       "ប្រើចូលស្ពុង ឬ ស្ទីមជំនួយស្បែកសភ្លឺថ្លា បំបាត់ក្រិន ដុះសាច់នៅក សសៃខ្ចី ឬ មានស្នាមអុជខ្មៅ យូរខែឆ្នាំ ស្បែកស្ងួត គ្រើមលាបឡេមិន ចូល មិនស",
-    price: 21.0,
+    price: 22.0,
     currency: "USD",
     category: "terkpley",
     image: "/products/terkpley/030.jpg",
@@ -742,6 +742,158 @@ export const PRODUCTS: Product[] = [
     badge: "new",
     inStock: true,
   },
+  {
+    id: "prod-046",
+    name: "ឈុត special promotion ថែមចានត្រឡោក ",
+    name_kh:
+      "ប្រេងសង្វារដបធំ500ml + ស្ក្រាប់កាហ្វេប្រេងចិនសែ 1000ក្រាម + ស្ក្រាប់មើមពន្លៃ 1000ក្រាម +ទឹកពន្លៃ 600ml ",
+    description:
+      "Large Mom & New Mom Set 👩🏻‍🍼 Suitable for new mothers 5–7 days after giving birth.",
+    description_kh:
+      "ឈុតធំ អ្នកសសៃខ្ចីកូនខ្ចី សម្រាលបាន5-7ថ្ងៃប្រើភ្លាម👩🏻‍🍼 សម្រួលសសៃឈាមបាត់ទាស់ហើមស្បែកស្ពឹកដៃជើង ស្បែកសរលោង បាត់ស្នាមអុជខ្មៅ បាត់សង្វារ ឬ សសៃក្រហម ស្បែកម៉ត់ខៃ",
+    price: 58.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/046.jpg",
+    badge: "new",
+    inStock: true,
+  },
+  {
+    id: "prod-047",
+    name: "New Mom & Period Day Set (Turmeric Milk Scrub + Body Oil + Terk-Pley)",
+    name_kh:
+      "ឈុតសាកសម សំរាប់អ្នកសសៃខ្ចី ឬ មករដូវ ស្ក្រាប់មើមពន្លៃដោះគោ 1000ក្រាម + ប្រេងសង្វារដបតូច + ទឹកពន្លៃ 600ml",
+    description:
+      "Trial set for new mothers or period days. Includes Turmeric Milk Scrub (1000g), small Stretch Mark Body Oil and fresh Terk-Pley turmeric liquid (600ml).",
+    description_kh:
+      "ឈុតសាកសម សំរាប់អ្នកសសៃខ្ចី ឬ មករដូវ មានស្ក្រាប់មើមពន្លៃដោះគោ 1000ក្រាម ប្រេងសង្វារដបតូច នឹង ទឹកពន្លៃស្រស់ 600ml",
+    price: 25.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/047.jpg",
+    badge: "new",
+    inStock: true,
+  },
+  {
+    id: "prod-048",
+    name: "Big New Mom Set (Scrub 2000g + Terk-Pley + Body Oil + Lotion + Serum)",
+    name_kh:
+      "ឈុតធំម៉ាក់ៗកូនខ្ចី សសៃខ្ចី ស្ក្រាប់កាហ្វេប្រេងចិនសែ 1000ក្រាម + ស្ក្រាប់មើមពន្លៃដោះគោ 1000ក្រាម + ទឹកពន្លៃ 600ml + ប្រេងសង្វារ + ឡេ 600ក្រាម + សេរ៉ូមដោះគោ",
+    description:
+      "Big set for new moms. Includes Herbal Coffee Oil Scrub (1000g), Turmeric Milk Scrub (1000g), fresh Terk-Pley (600ml), small Stretch Mark Body Oil, LinLin Premium Body Lotion (600g) and Body Milk Serum Booster (200ml).",
+    description_kh:
+      "ឈុតធំម៉ាក់ៗកូនខ្ចី សសៃខ្ចី មានស្ក្រាប់ធំ 2000ក្រាម (កាហ្វេប្រេងចិនសែ + មើមពន្លៃដោះគោ) ទឹកពន្លៃ 600ml ប្រេងសង្វារ ឡេលីនលីន 600ក្រាម នឹង សេរ៉ូមដោះគោ 200ml",
+    price: 68.0,
+    currency: "USD",
+    category: "terkpley",
+    image: "/products/terkpley/048.jpg",
+    badge: "new",
+    inStock: true,
+  },
+  {
+    id: "prod-049",
+    name: "Weight Care & New Mom Set (Big Body Oil 500ml + Scrub 2000g)",
+    name_kh:
+      "ឈុតអ្នកទម្ងន់ ឬ កូនខ្ចី ប្រេងផ្កាដបធំ 500ml + ស្ក្រាប់កាហ្វេប្រេងចិនសែ 1000ក្រាម + ស្ក្រាប់មើមពន្លៃដោះគោ 1000ក្រាម",
+    description:
+      "Set for weight care or new moms. Includes big Stretch Mark Body Oil (500ml), Traditional Herbal Coffee Oil Scrub (1000g) and Turmeric Milk Scrub (1000g). Turmeric helps circulation, reduces stretch marks and smooths dry skin.",
+    description_kh:
+      "ឈុតអ្នកទម្ងន់ ឬ កូនខ្ចី មើមពន្លៃសម្រួលសសៃឈាម បាត់សង្វារ ស្បែកស្ងួត សម៉ត់",
+    price: 50.0,
+    currency: "USD",
+    category: "scrub",
+    image: "/products/scrub/049.jpg",
+    badge: "new",
+    inStock: true,
+  },
+  {
+    id: "prod-050",
+    name: "Weight Care & New Mom Set (Body Oil 120ml + Scrub 2000g)",
+    name_kh:
+      "ឈុតអ្នកទម្ងន់ ឬ កូនខ្ចី ប្រេង 120ml + ស្ក្រាប់កាហ្វេប្រេងចិនសែ 1000ក្រាម + ស្ក្រាប់មើមពន្លៃដោះគោស្រស់ 1000ក្រាម",
+    description:
+      "Set for weight care or new moms. Includes Stretch Mark Body Oil (120ml), Traditional Herbal Coffee Oil Scrub (1000g) and fresh Turmeric Milk Scrub (1000g). Free delivery.",
+    description_kh:
+      "ឈុតអ្នកទម្ងន់ ឬ កូនខ្ចី ប្រេង 120ml ស្ក្រាប់កាហ្វេប្រេងចិនសែ 1000ក្រាម នឹង មើមពន្លៃដោះគោស្រស់ 1000ក្រាម ហ្វ្រីដឹក",
+    price: 32.0,
+    currency: "USD",
+    category: "scrub",
+    image: "/products/scrub/050.jpg",
+    badge: "new",
+    inStock: true,
+  },
+  {
+    id: "prod-060",
+    name: "Turmeric Milk Scrub + Herbal Coffee Oil Scrub (2kg Set)",
+    name_kh:
+      "ស្ក្រាប់មើមពន្លៃដោះគោ 1000ក្រាម + ស្ក្រាប់កាហ្វេប្រេងចិនសែបុរាណ 1000ក្រាម (២គីឡូ)",
+    description:
+      "Big scrub set, 2000g total: Turmeric Milk Scrub (1000g) and Traditional Herbal Coffee Oil Scrub (1000g).",
+    description_kh:
+      "ឈុតស្ក្រាប់ធំ 2000ក្រាម (២គីឡូ) ស្ក្រាប់មើមពន្លៃដោះគោ 1000ក្រាម + ស្ក្រាប់កាហ្វេប្រេងចិនសែបុរាណ 1000ក្រាម",
+    price: 18.0,
+    currency: "USD",
+    category: "scrub",
+    image: "/products/scrub/060.jpg",
+    badge: "new",
+    inStock: true,
+  },
+  {
+    id: "prod-061",
+    name: "Full Body Care Set for Thin, Damaged Skin (Cream + Lotion + Oil + Serum)",
+    name_kh:
+      "ឈុតព្យាបាលស្បែកស្តើងខូចចេញសសៃ ឈុតគ្រប់មុខ គ្រីមបំបុកសx10 + ឡេលីនលីន 600ក្រាម + ប្រេងសង្វារ + សេរ៉ូមដោះគោ SPF50",
+    description:
+      "Complete set for thin, damaged skin with visible veins. Includes Body Cream Whitening x10, LinLin Premium Body Lotion (600g), Body Oil and Body Milk Serum Booster SPF50+ PA++ (200ml). Whitening, moisturizing, nourishing and sun protection. Free delivery.",
+    description_kh:
+      "ឈុតព្យាបាលស្បែកស្តើងខូចចេញសសៃ ឈុតគ្រប់មុខ ជួយអោយស ផ្តល់សំណើម ចិញ្ចឹមស្បែក នឹង ការពារកម្តៅថ្ងៃ SPF50 ហ្វ្រីដឹក",
+    price: 46.0,
+    currency: "USD",
+    category: "lotion",
+    image: "/products/lotion/061.jpg",
+    badge: "new",
+    inStock: true,
+  },
+  {
+    id: "prod-062",
+    name: "LinLin Body Lotion + Body Serum (Best Seller)",
+    name_kh: "ឡេលីនលីន 600ក្រាម + សេរ៉ូមដោះគោ SPF50",
+    description:
+      "Best seller set: LinLin Premium Body Lotion (600g) + Body Milk Serum Booster SPF50+ (200ml). Whitening, deep moisturizing, UV protection, glowing and smooth skin. Free delivery.",
+    description_kh:
+      "ឈុតលក់ដាច់ ឡេលីនលីន 600ក្រាម + សេរ៉ូមដោះគោ SPF50 ជួយអោយស ផ្តល់សំណើម ការពារកម្តៅថ្ងៃ ស្បែកភ្លឺរលោង ហ្វ្រីដឹក",
+    price: 30.0,
+    currency: "USD",
+    category: "lotion",
+    image: "/products/lotion/062.jpg",
+    badge: "new",
+    inStock: true,
+  },
+  {
+    id: "prod-063",
+    name: "LinLin Body Care Set for Yellow Skin (Cream + Lotion + Serum)",
+    name_kh:
+      "ឈុតបំបាត់ស្បែកលឿង ជំនួយសខ្លាំង គ្រីមបំបុកសx10 + ឡេលីនលីន 600ក្រាម + សេរ៉ូមដោះគោ SPF50",
+    description:
+      "Set to reduce yellow skin tone with strong whitening. Includes Body Cream Whitening x10, LinLin Premium Body Lotion (600g) and Body Milk Serum Booster SPF50+ (200ml). Deep hydration, bright glow and skin protection. Free delivery.",
+    description_kh:
+      "ឈុតបំបាត់ស្បែកលឿង ជំនួយសខ្លាំង ផ្តល់សំណើមជ្រៅ ស្បែកភ្លឺថ្លា ការពារស្បែក ហ្វ្រីដឹក",
+    price: 40.0,
+    currency: "USD",
+    category: "lotion",
+    image: "/products/lotion/063.jpg",
+    badge: "new",
+    inStock: true,
+  },
+];
+
+/*
+ * Display order: products with badge "new" come first (most recently added
+ * at the top), then everything else in the order listed above.
+ */
+export const PRODUCTS: Product[] = [
+  ...PRODUCT_LIST.filter(p => p.badge === "new" && !p.comingSoon).reverse(),
+  ...PRODUCT_LIST.filter(p => !(p.badge === "new" && !p.comingSoon)),
 ];
 
 /*
