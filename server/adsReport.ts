@@ -7,8 +7,11 @@
  * Schedule — all times Cambodia (Asia/Phnom_Penh):
  *   DAILY    22:00 every night           -> today's numbers
  *   CYCLE    23:00, only on a night when a campaign's end date is today
- *            (end-of-boost review)       -> that campaign run's full period
- *   MONTHLY  23:30 on the last day of the month -> whole month
+ *            (end-of-boost review)       -> the LAST 7 DAYS from today
+ *   MONTHLY  23:30 on the last day of the month -> the LAST 30 DAYS from today
+ *
+ * Both the weekly and monthly windows are rolling: they count back from
+ * today, not from a campaign's start date and not from the 1st of the month.
  *
  * Wire-up in server/index.ts:
  *   import { startAdsReportScheduler, sendAdsReport } from "./adsReport";
@@ -41,24 +44,51 @@ const ACCOUNTS: Array<{ id: string; page: string }> = [
 
 type Period = "daily" | "cycle" | "monthly";
 
-interface MetaAction { action_type: string; value: string }
-interface Insight { spend?: string; actions?: MetaAction[]; action_values?: MetaAction[] }
+interface MetaAction {
+  action_type: string;
+  value: string;
+}
+interface Insight {
+  spend?: string;
+  actions?: MetaAction[];
+  action_values?: MetaAction[];
+}
 
 interface PageRow {
-  page: string; purchases: number; messages: number;
-  spend: number; revenue: number; failed: boolean;
+  page: string;
+  purchases: number;
+  messages: number;
+  spend: number;
+  revenue: number;
+  failed: boolean;
 }
 
 /* ─────────────────────────── dates (Cambodia) ─────────────────────────── */
 
-const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MON = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 /** Cambodia-local calendar date, regardless of the server's own timezone. */
 function ppParts(offsetDays = 0) {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() + offsetDays);
   const iso = new Intl.DateTimeFormat("en-CA", {
-    timeZone: ADS.TZ, year: "numeric", month: "2-digit", day: "2-digit",
+    timeZone: ADS.TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   }).format(d);
   const [year, month, day] = iso.split("-");
   return { iso, day, month, year, mon: MON[Number(month) - 1] };
@@ -72,14 +102,21 @@ const isLastDayOfMonth = () => ppParts(0).month !== ppParts(1).month;
 /** Cambodia-local YYYY-MM-DD for any timestamp Meta returns. */
 function toPPDate(ts: string): string {
   return new Intl.DateTimeFormat("en-CA", {
-    timeZone: ADS.TZ, year: "numeric", month: "2-digit", day: "2-digit",
+    timeZone: ADS.TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   }).format(new Date(ts));
 }
 
 /* ──────────────────────────── Meta Graph API ──────────────────────────── */
 
 /** Messenger purchases — what Ads Manager shows as "Meta Purchase". */
-const PURCHASE_TYPES = ["onsite_conversion.purchase", "omni_purchase", "purchase"];
+const PURCHASE_TYPES = [
+  "onsite_conversion.purchase",
+  "omni_purchase",
+  "purchase",
+];
 
 /** Conversations started — the "Messenger" count. Meta names this
  *  differently across accounts, so try the known variants in order. */
@@ -92,13 +129,16 @@ const MESSAGE_TYPES = [
 function pickFirst(list: MetaAction[] | undefined, types: string[]): number {
   if (!list) return 0;
   for (const t of types) {
-    const hit = list.find((a) => a.action_type === t);
+    const hit = list.find(a => a.action_type === t);
     if (hit) return Number(hit.value) || 0;
   }
   return 0;
 }
 
-async function graph(path: string, params: Record<string, string>): Promise<any> {
+async function graph(
+  path: string,
+  params: Record<string, string>
+): Promise<any> {
   const url = new URL(`https://graph.facebook.com/${ADS.GRAPH}/${path}`);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
   url.searchParams.set("access_token", ADS.META_TOKEN);
@@ -115,7 +155,12 @@ async function fetchPage(
   until: string
 ): Promise<PageRow> {
   const base: PageRow = {
-    page: acct.page, purchases: 0, messages: 0, spend: 0, revenue: 0, failed: false,
+    page: acct.page,
+    purchases: 0,
+    messages: 0,
+    spend: 0,
+    revenue: 0,
+    failed: false,
   };
   try {
     const json = await graph(`act_${acct.id}/insights`, {
@@ -124,7 +169,7 @@ async function fetchPage(
       time_range: JSON.stringify({ since, until }),
     });
     const row: Insight | undefined = json.data?.[0];
-    if (!row) return base;                    // no delivery in this window
+    if (!row) return base; // no delivery in this window
     return {
       page: acct.page,
       purchases: pickFirst(row.actions, PURCHASE_TYPES),
@@ -140,40 +185,38 @@ async function fetchPage(
 }
 
 /**
- * Campaigns whose end date is today, and the earliest start among them.
- * This is what makes the cycle report follow the 7-day rescheduling habit
- * instead of a fixed weekday.
+ * True when at least one campaign's end date is today. This decides WHETHER
+ * the cycle report fires tonight, so the review follows the rescheduling
+ * habit instead of a fixed weekday. It does not decide the date window —
+ * that is always the last 7 days from today (see sendAdsReport).
  */
-async function campaignsEndingToday(): Promise<{ ending: boolean; since: string }> {
+async function campaignsEndingToday(): Promise<boolean> {
   const today = ppParts(0).iso;
-  let earliest: string | null = null;
-  let ending = false;
 
   for (const acct of ACCOUNTS) {
     try {
       const json = await graph(`act_${acct.id}/campaigns`, {
-        fields: "name,start_time,stop_time",
+        fields: "name,stop_time",
         limit: "200",
       });
       for (const c of json.data || []) {
-        if (!c.stop_time || toPPDate(c.stop_time) !== today) continue;
-        ending = true;
-        if (c.start_time) {
-          const start = toPPDate(c.start_time);
-          if (!earliest || start < earliest) earliest = start;
-        }
+        if (c.stop_time && toPPDate(c.stop_time) === today) return true;
       }
     } catch (err) {
       console.error(`❌ [adsReport] campaign scan ${acct.page}:`, err);
     }
   }
-  return { ending, since: earliest || ppParts(-6).iso };
+  return false;
 }
 
 /* ───────────────────────────── formatting ─────────────────────────────── */
 
 const money = (n: number) =>
-  "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  "$" +
+  n.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
 function buildMessage(period: Period, label: string, rows: PageRow[]): string {
   const lines: string[] = [];
@@ -195,7 +238,8 @@ function buildMessage(period: Period, label: string, rows: PageRow[]): string {
 
   const spend = rows.reduce((a, r) => a + r.spend, 0);
   const revenue = rows.reduce((a, r) => a + r.revenue, 0);
-  const head = period === "cycle" ? "Weekly" : "Monthly";
+  const head =
+    period === "cycle" ? "Weekly (last 7 days)" : "Monthly (last 30 days)";
 
   lines.push(`📈 <b>${head}: ${label}</b>`, "");
   for (const r of rows) {
@@ -226,14 +270,17 @@ async function sendToAdsGroup(text: string): Promise<void> {
     body: JSON.stringify(body),
   });
   const json = (await res.json()) as { ok: boolean; description?: string };
-  if (!json.ok) throw new Error(`Telegram rejected the message: ${json.description}`);
+  if (!json.ok)
+    throw new Error(`Telegram rejected the message: ${json.description}`);
 }
 
 /* ──────────────────────────────── public ──────────────────────────────── */
 
 export async function sendAdsReport(period: Period): Promise<void> {
   if (!ADS.BOT_TOKEN || !ADS.GROUP_ID || !ADS.META_TOKEN) {
-    console.error("❌ [adsReport] missing TELEGRAM_BOT_TOKEN, ADS_REPORT_GROUP_ID or META_ACCESS_TOKEN");
+    console.error(
+      "❌ [adsReport] missing TELEGRAM_BOT_TOKEN, ADS_REPORT_GROUP_ID or META_ACCESS_TOKEN"
+    );
     return;
   }
 
@@ -241,20 +288,23 @@ export async function sendAdsReport(period: Period): Promise<void> {
   let since = today.iso;
   let label = pretty(today);
 
-  if (period === "cycle") {
-    const { since: s } = await campaignsEndingToday();
-    since = s;
-    const [sy, sm, sd] = s.split("-");
-    const sameMonth = sm === today.month && sy === today.year;
+  // Rolling windows counted back from today — NOT from a campaign start
+  // date and NOT from the 1st of the month. Weekly = the last 7 days
+  // (today plus the 6 before it); monthly = the last 30 days.
+  if (period === "cycle" || period === "monthly") {
+    const days = period === "cycle" ? 7 : 30;
+    const start = ppParts(-(days - 1));
+    since = start.iso;
+    const sameMonth = start.month === today.month && start.year === today.year;
+    // "02-08/Oct/2026" inside one month, "09/Sep-08/Oct/2026" across two.
     label = sameMonth
-      ? `${sd}-${today.day}/${today.mon}/${today.year}`
-      : `${sd}/${MON[Number(sm) - 1]}-${today.day}/${today.mon}/${today.year}`;
-  } else if (period === "monthly") {
-    since = `${today.year}-${today.month}-01`;
-    label = `${today.mon} ${today.year}`;
+      ? `${start.day}-${today.day}/${today.mon}/${today.year}`
+      : `${start.day}/${start.mon}-${today.day}/${today.mon}/${today.year}`;
   }
 
-  const rows = await Promise.all(ACCOUNTS.map((a) => fetchPage(a, since, today.iso)));
+  const rows = await Promise.all(
+    ACCOUNTS.map(a => fetchPage(a, since, today.iso))
+  );
 
   try {
     await sendToAdsGroup(buildMessage(period, label, rows));
@@ -263,7 +313,6 @@ export async function sendAdsReport(period: Period): Promise<void> {
     console.error("❌ [adsReport] send failed:", err);
   }
 }
-
 
 /* ───────────────────────── issue scan ─────────────────────────────────
  * Rule-based health check over the last 7 days. It catches the mechanical
@@ -274,25 +323,39 @@ export async function sendAdsReport(period: Period): Promise<void> {
  * ------------------------------------------------------------------- */
 
 const RULES = {
-  deadSpend: 15,      // USD spent with zero purchases over the window
-  minToJudge: 30,     // USD before ROAS is taken seriously
-  roasFloor: 2.0,     // below this and the ad set is barely paying for itself
-  freqHigh: 8.0,      // same people seeing the ads too often
+  deadSpend: 15, // USD spent with zero purchases over the window
+  minToJudge: 30, // USD before ROAS is taken seriously
+  roasFloor: 2.0, // below this and the ad set is barely paying for itself
+  freqHigh: 8.0, // same people seeing the ads too often
 };
 
 interface AdSetRow {
-  id: string; name: string; campaign: string; status: string;
-  spend: number; purchases: number; roas: number; frequency: number;
-  deliveryStatus: string; deliverySub: string;
+  id: string;
+  name: string;
+  campaign: string;
+  status: string;
+  spend: number;
+  purchases: number;
+  roas: number;
+  frequency: number;
+  deliveryStatus: string;
+  deliverySub: string;
 }
 
 interface Issue {
-  title: string; detail: string; fix: string; worth: string;
+  title: string;
+  detail: string;
+  fix: string;
+  worth: string;
   /** Set only for issues /gotofix may act on. Pausing is reversible; nothing else is attempted. */
   auto?: { accountId: string; adsetId: string; label: string };
 }
 
-async function fetchAdSets(acct: { id: string; page: string }, since: string, until: string): Promise<AdSetRow[]> {
+async function fetchAdSets(
+  acct: { id: string; page: string },
+  since: string,
+  until: string
+): Promise<AdSetRow[]> {
   try {
     const json = await graph(`act_${acct.id}/insights`, {
       level: "adset",
@@ -305,18 +368,28 @@ async function fetchAdSets(acct: { id: string; page: string }, since: string, un
       const spend = Number(r.spend) || 0;
       const purchases = pickFirst(r.actions, PURCHASE_TYPES);
       rows.push({
-        id: r.adset_id, name: r.adset_name || "?", campaign: r.campaign_name || "",
-        spend, purchases, roas: 0, frequency: Number(r.frequency) || 0,
-        status: "", deliveryStatus: "", deliverySub: "",
+        id: r.adset_id,
+        name: r.adset_name || "?",
+        campaign: r.campaign_name || "",
+        spend,
+        purchases,
+        roas: 0,
+        frequency: Number(r.frequency) || 0,
+        status: "",
+        deliveryStatus: "",
+        deliverySub: "",
       });
     }
     // revenue needs a second pass through action_values
     const vj = await graph(`act_${acct.id}/insights`, {
-      level: "adset", fields: "adset_id,action_values",
-      time_range: JSON.stringify({ since, until }), limit: "100",
+      level: "adset",
+      fields: "adset_id,action_values",
+      time_range: JSON.stringify({ since, until }),
+      limit: "100",
     });
     const rev = new Map<string, number>();
-    for (const r of vj.data || []) rev.set(r.adset_id, pickFirst(r.action_values, PURCHASE_TYPES));
+    for (const r of vj.data || [])
+      rev.set(r.adset_id, pickFirst(r.action_values, PURCHASE_TYPES));
     for (const row of rows) {
       const v = rev.get(row.id) || 0;
       row.roas = row.spend > 0 ? v / row.spend : 0;
@@ -329,11 +402,20 @@ async function fetchAdSets(acct: { id: string; page: string }, since: string, un
 }
 
 /** Ad sets whose delivery is in error — their ads cannot run at all. */
-async function fetchBrokenAdSets(acct: { id: string; page: string }): Promise<string[]> {
+async function fetchBrokenAdSets(acct: {
+  id: string;
+  page: string;
+}): Promise<string[]> {
   try {
     const json = await graph(`act_${acct.id}/adsets`, {
       fields: "name,effective_status,status",
-      filtering: JSON.stringify([{ field: "effective_status", operator: "IN", value: ["WITH_ISSUES", "DISAPPROVED"] }]),
+      filtering: JSON.stringify([
+        {
+          field: "effective_status",
+          operator: "IN",
+          value: ["WITH_ISSUES", "DISAPPROVED"],
+        },
+      ]),
       limit: "100",
     });
     return (json.data || []).map((a: any) => a.name as string);
@@ -342,7 +424,12 @@ async function fetchBrokenAdSets(acct: { id: string; page: string }): Promise<st
   }
 }
 
-function scan(page: string, accountId: string, rows: AdSetRow[], broken: string[]): Issue[] {
+function scan(
+  page: string,
+  accountId: string,
+  rows: AdSetRow[],
+  broken: string[]
+): Issue[] {
   const out: Issue[] = [];
 
   for (const name of broken) {
@@ -350,7 +437,8 @@ function scan(page: string, accountId: string, rows: AdSetRow[], broken: string[
       title: `${page} · ${name} — ads blocked`,
       detail: "Meta has flagged the ads in this ad set, so it cannot deliver.",
       fix: "Open the ad set in Ads Manager, read the error on each ad, then rebuild the ads by duplicating a working one.",
-      worth: "High — this ad set is producing nothing while its budget sits idle.",
+      worth:
+        "High — this ad set is producing nothing while its budget sits idle.",
     });
   }
 
@@ -370,9 +458,10 @@ function scan(page: string, accountId: string, rows: AdSetRow[], broken: string[
         title: `${page} · ${r.name} — audience worn out`,
         detail: `Frequency ${r.frequency.toFixed(1)} — the same people keep seeing the ads.`,
         fix: "Widen the audience, merge it with a similar one, or cut this campaign's budget.",
-        worth: r.roas < RULES.roasFloor
-          ? `High — also running at ${r.roas.toFixed(2)}x, so it is losing money.`
-          : "Medium — still profitable, but it will decline if left alone.",
+        worth:
+          r.roas < RULES.roasFloor
+            ? `High — also running at ${r.roas.toFixed(2)}x, so it is losing money.`
+            : "Medium — still profitable, but it will decline if left alone.",
         // Only auto-pausable when it is BOTH worn out and losing money.
         ...(r.roas > 0 && r.roas < RULES.roasFloor
           ? { auto: { accountId, adsetId: r.id, label: `${page} · ${r.name}` } }
@@ -386,9 +475,10 @@ function scan(page: string, accountId: string, rows: AdSetRow[], broken: string[
         title: `${page} · ${r.name} — below ${RULES.roasFloor.toFixed(1)}x`,
         detail: `$${r.spend.toFixed(2)} spent at ${r.roas.toFixed(2)}x.`,
         fix: "Give it one more week, then turn it off if it has not improved. Do not add new creative here.",
-        worth: waste > 0
-          ? `Roughly $${waste.toFixed(0)} a week below break-even.`
-          : "Low — close to break-even.",
+        worth:
+          waste > 0
+            ? `Roughly $${waste.toFixed(0)} a week below break-even.`
+            : "Low — close to break-even.",
       });
     }
   }
@@ -396,7 +486,10 @@ function scan(page: string, accountId: string, rows: AdSetRow[], broken: string[
 }
 
 /** Issues /gotofix may act on, from the most recent scan. Expires after 2h. */
-let pendingFixes: { at: number; items: NonNullable<Issue["auto"]>[] } = { at: 0, items: [] };
+let pendingFixes: { at: number; items: NonNullable<Issue["auto"]>[] } = {
+  at: 0,
+  items: [],
+};
 
 export async function sendAdsIssues(): Promise<void> {
   if (!ADS.BOT_TOKEN || !ADS.GROUP_ID || !ADS.META_TOKEN) {
@@ -409,13 +502,23 @@ export async function sendAdsIssues(): Promise<void> {
   const all: Issue[] = [];
 
   for (const acct of ACCOUNTS) {
-    const [rows, broken] = await Promise.all([fetchAdSets(acct, since, until), fetchBrokenAdSets(acct)]);
+    const [rows, broken] = await Promise.all([
+      fetchAdSets(acct, since, until),
+      fetchBrokenAdSets(acct),
+    ]);
     all.push(...scan(acct.page, acct.id, rows, broken));
   }
 
-  pendingFixes = { at: Date.now(), items: all.map((i) => i.auto).filter(Boolean) as NonNullable<Issue["auto"]>[] };
+  pendingFixes = {
+    at: Date.now(),
+    items: all.map(i => i.auto).filter(Boolean) as NonNullable<Issue["auto"]>[],
+  };
 
-  const lines: string[] = [`🔎 <b>Daily check — ${pretty(ppParts(0))}</b>`, "<i>Last 7 days</i>", ""];
+  const lines: string[] = [
+    `🔎 <b>Daily check — ${pretty(ppParts(0))}</b>`,
+    "<i>Last 7 days</i>",
+    "",
+  ];
 
   if (!all.length) {
     lines.push("✅ <b>Everything smooth — no issues found.</b>");
@@ -432,11 +535,17 @@ export async function sendAdsIssues(): Promise<void> {
 
     if (pendingFixes.items.length) {
       lines.push("");
-      lines.push(`🤖 <b>${pendingFixes.items.length} of these can be fixed automatically</b> (by turning the ad set off).`);
-      lines.push("Send <code>/gotofix</code> to see exactly what would change.");
+      lines.push(
+        `🤖 <b>${pendingFixes.items.length} of these can be fixed automatically</b> (by turning the ad set off).`
+      );
+      lines.push(
+        "Send <code>/gotofix</code> to see exactly what would change."
+      );
     } else {
       lines.push("");
-      lines.push("🖐 <b>These all need manual work</b> — nothing safe to automate.");
+      lines.push(
+        "🖐 <b>These all need manual work</b> — nothing safe to automate."
+      );
     }
   }
 
@@ -467,7 +576,9 @@ export async function handleGoToFix(confirmed: boolean): Promise<string> {
     const l = ["\u{1F916} <b>These would be turned off:</b>", ""];
     pendingFixes.items.forEach((f, n) => l.push(`${n + 1}. ${f.label}`));
     l.push("");
-    l.push("Pausing only \u2014 nothing is deleted and you can switch them back on any time.");
+    l.push(
+      "Pausing only \u2014 nothing is deleted and you can switch them back on any time."
+    );
     l.push("Send <code>/gotofix yes</code> to apply.");
     return l.join("\n");
   }
@@ -477,13 +588,25 @@ export async function handleGoToFix(confirmed: boolean): Promise<string> {
 
   for (const f of pendingFixes.items) {
     try {
-      const res = await fetch(`https://graph.facebook.com/${ADS.GRAPH}/${f.adsetId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "PAUSED", access_token: ADS.META_TOKEN }),
-      });
-      const json = (await res.json()) as { success?: boolean; error?: { message: string } };
-      if (json.error) { failed.push(`${f.label} \u2014 ${json.error.message}`); continue; }
+      const res = await fetch(
+        `https://graph.facebook.com/${ADS.GRAPH}/${f.adsetId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: "PAUSED",
+            access_token: ADS.META_TOKEN,
+          }),
+        }
+      );
+      const json = (await res.json()) as {
+        success?: boolean;
+        error?: { message: string };
+      };
+      if (json.error) {
+        failed.push(`${f.label} \u2014 ${json.error.message}`);
+        continue;
+      }
       done.push(f.label);
     } catch (err) {
       failed.push(`${f.label} \u2014 ${String(err)}`);
@@ -495,14 +618,16 @@ export async function handleGoToFix(confirmed: boolean): Promise<string> {
   const l: string[] = [];
   if (done.length) {
     l.push(`\u2705 <b>Turned off ${done.length}:</b>`);
-    done.forEach((d) => l.push(`   \u2022 ${d}`));
+    done.forEach(d => l.push(`   \u2022 ${d}`));
   }
   if (failed.length) {
     l.push("");
     l.push(`\u26A0\uFE0F <b>Could not change ${failed.length}:</b>`);
-    failed.forEach((d) => l.push(`   \u2022 ${d}`));
+    failed.forEach(d => l.push(`   \u2022 ${d}`));
     l.push("");
-    l.push("If this says permissions, the Meta token needs <b>ads_management</b>, not just ads_read.");
+    l.push(
+      "If this says permissions, the Meta token needs <b>ads_management</b>, not just ads_read."
+    );
   }
   l.push("");
   l.push("Budget moves to the remaining ad sets. Check tomorrow's report.");
@@ -519,7 +644,10 @@ export async function handleGoToFix(confirmed: boolean): Promise<string> {
  * period=cycle still checks whether a campaign actually ends today and skips
  * if not, so it is safe to call every night.
  */
-export async function handleAdsReportRequest(req: any, res: any): Promise<void> {
+export async function handleAdsReportRequest(
+  req: any,
+  res: any
+): Promise<void> {
   const key = String(req.query?.key || "");
   if (!ADS.TRIGGER_KEY || key !== ADS.TRIGGER_KEY) {
     res.status(403).json({ ok: false, error: "forbidden" });
@@ -536,8 +664,7 @@ export async function handleAdsReportRequest(req: any, res: any): Promise<void> 
     raw === "cycle" ? "cycle" : raw === "monthly" ? "monthly" : "daily";
 
   if (period === "cycle") {
-    const { ending } = await campaignsEndingToday();
-    if (!ending) {
+    if (!(await campaignsEndingToday())) {
       res.json({ ok: true, skipped: "no campaign ends today" });
       return;
     }
@@ -555,10 +682,14 @@ export async function handleAdsReportRequest(req: any, res: any): Promise<void> 
 export async function pingAdsGroup(): Promise<void> {
   if (!ADS.GROUP_ID || !ADS.BOT_TOKEN) return;
   const now = new Intl.DateTimeFormat("en-GB", {
-    timeZone: ADS.TZ, dateStyle: "medium", timeStyle: "short",
+    timeZone: ADS.TZ,
+    dateStyle: "medium",
+    timeStyle: "short",
   }).format(new Date());
   try {
-    await sendToAdsGroup(`🟢 <b>Ads report service started</b>\n${now} (Cambodia)\nDaily 22:00 · Boost-end 23:00 · Monthly 23:30`);
+    await sendToAdsGroup(
+      `🟢 <b>Ads report service started</b>\n${now} (Cambodia)\nDaily 22:00 · Boost-end 23:00 · Monthly 23:30`
+    );
     console.log("✅ [adsReport] startup ping delivered");
   } catch (err) {
     console.error("❌ [adsReport] startup ping failed:", err);
@@ -567,27 +698,43 @@ export async function pingAdsGroup(): Promise<void> {
 
 export function startAdsReportScheduler(): void {
   if (!ADS.GROUP_ID) {
-    console.warn("⚠️  [adsReport] ADS_REPORT_GROUP_ID not set — scheduler idle");
+    console.warn(
+      "⚠️  [adsReport] ADS_REPORT_GROUP_ID not set — scheduler idle"
+    );
     return;
   }
 
   // 22:00 — every night, today's numbers.
-  cron.schedule("0 22 * * *", () => void sendAdsReport("daily"), { timezone: ADS.TZ });
+  cron.schedule("0 22 * * *", () => void sendAdsReport("daily"), {
+    timezone: ADS.TZ,
+  });
 
   // 22:05 — the issue check, just after the daily numbers.
   cron.schedule("5 22 * * *", () => void sendAdsIssues(), { timezone: ADS.TZ });
 
   // 23:00 — end-of-boost review, only on a night when a campaign ends today.
-  cron.schedule("0 23 * * *", async () => {
-    const { ending } = await campaignsEndingToday();
-    if (ending) await sendAdsReport("cycle");
-    else console.log("ℹ️  [adsReport] no campaign ends today — skipping cycle report");
-  }, { timezone: ADS.TZ });
+  cron.schedule(
+    "0 23 * * *",
+    async () => {
+      if (await campaignsEndingToday()) await sendAdsReport("cycle");
+      else
+        console.log(
+          "ℹ️  [adsReport] no campaign ends today — skipping cycle report"
+        );
+    },
+    { timezone: ADS.TZ }
+  );
 
   // 23:30 — only on the last day of the month.
-  cron.schedule("30 23 * * *", async () => {
-    if (isLastDayOfMonth()) await sendAdsReport("monthly");
-  }, { timezone: ADS.TZ });
+  cron.schedule(
+    "30 23 * * *",
+    async () => {
+      if (isLastDayOfMonth()) await sendAdsReport("monthly");
+    },
+    { timezone: ADS.TZ }
+  );
 
-  console.log(`✅ [adsReport] armed → group ${ADS.GROUP_ID} | daily 22:00 + check 22:05, boost-end review 23:00, monthly 23:30 (${ADS.TZ})`);
+  console.log(
+    `✅ [adsReport] armed → group ${ADS.GROUP_ID} | daily 22:00 + check 22:05, boost-end review 23:00, monthly 23:30 (${ADS.TZ})`
+  );
 }
