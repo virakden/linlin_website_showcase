@@ -831,7 +831,7 @@ const PRODUCT_LIST: Product[] = [
       "Big scrub set, 2000g total: Turmeric Milk Scrub (1000g) and Traditional Herbal Coffee Oil Scrub (1000g).",
     description_kh:
       "ឈុតស្ក្រាប់ធំ 2000ក្រាម (២គីឡូ) ស្ក្រាប់មើមពន្លៃដោះគោ 1000ក្រាម + ស្ក្រាប់កាហ្វេប្រេងចិនសែបុរាណ 1000ក្រាម",
-    price: 18.0,
+    price: 26.0,
     currency: "USD",
     category: "scrub",
     image: "/products/scrub/060.jpg",
