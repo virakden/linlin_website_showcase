@@ -601,10 +601,14 @@ export async function handleGoToFix(confirmed: boolean): Promise<string> {
       );
       const json = (await res.json()) as {
         success?: boolean;
-        error?: { message: string };
+        error?: { message: string; code?: number; error_subcode?: number };
       };
       if (json.error) {
-        failed.push(`${f.label} \u2014 ${json.error.message}`);
+        const e = json.error;
+        const codes = [e.code, e.error_subcode].filter(Boolean).join("/");
+        failed.push(
+          `${f.label} \u2014 ${e.message}${codes ? ` (code ${codes})` : ""}`
+        );
         continue;
       }
       done.push(f.label);
@@ -626,11 +630,90 @@ export async function handleGoToFix(confirmed: boolean): Promise<string> {
     failed.forEach(d => l.push(`   \u2022 ${d}`));
     l.push("");
     l.push(
-      "If this says permissions, the Meta token needs <b>ads_management</b>, not just ads_read."
+      "Send <code>/whoami</code> to see exactly what this token is allowed to do."
     );
   }
   l.push("");
   l.push("Budget moves to the remaining ad sets. Check tomorrow's report.");
+  return l.join("\n");
+}
+
+/* ───────────────────────── token self-check ───────────────────────────
+ * /whoami — answers "why can't the bot change anything?" without anyone
+ * pasting a token anywhere.
+ *
+ * There are three separate things that must all be true before a PAUSE
+ * works, and Meta returns the same useless "Permissions error" for all
+ * three. This separates them:
+ *
+ *   1. The running process must hold the NEW token. Railway reads env
+ *      vars once at boot, so editing the variable without a redeploy
+ *      leaves the old token in memory. -> "Token identity" / "Expires"
+ *   2. The token must carry the ads_management scope.  -> "ads_management"
+ *   3. The token's user must hold MANAGE or ADVERTISE on THAT ad account.
+ *      A scope is not a role: ads_management with only ANALYZE on the
+ *      account reads fine and writes nothing — which is exactly the
+ *      "reports work, /gotofix fails" symptom.      -> the per-account line
+ */
+export async function handleWhoAmI(): Promise<string> {
+  if (!ADS.META_TOKEN)
+    return "❌ No <code>META_ACCESS_TOKEN</code> set on the server.";
+
+  const l: string[] = ["\u{1F511} <b>Meta token check</b>", ""];
+
+  try {
+    const me = await graph("me", { fields: "id,name" });
+    l.push(
+      `<b>Token belongs to:</b> ${me.name || "(unnamed)"} · <code>${me.id}</code>`
+    );
+  } catch (err) {
+    l.push(`<b>Token belongs to:</b> ❌ ${String(err)}`);
+  }
+
+  try {
+    const dbg = await graph("debug_token", { input_token: ADS.META_TOKEN });
+    const d = (dbg.data || {}) as {
+      scopes?: string[];
+      expires_at?: number;
+      data_access_expires_at?: number;
+    };
+    const scopes = d.scopes || [];
+    const exp = !d.expires_at
+      ? "never"
+      : new Date(d.expires_at * 1000)
+          .toISOString()
+          .slice(0, 16)
+          .replace("T", " ") + " UTC";
+    l.push(`<b>Expires:</b> ${exp}`);
+    l.push(
+      `<b>ads_read:</b> ${scopes.includes("ads_read") ? "✅" : "❌ missing"}`
+    );
+    l.push(
+      `<b>ads_management:</b> ${scopes.includes("ads_management") ? "✅" : "❌ missing"}`
+    );
+  } catch (err) {
+    l.push(`<b>Scopes:</b> could not read — ${String(err)}`);
+  }
+
+  l.push("", "<b>Allowed on each account:</b>");
+  for (const acct of ACCOUNTS) {
+    try {
+      const a = await graph(`act_${acct.id}`, { fields: "name,user_tasks" });
+      const tasks: string[] = a.user_tasks || [];
+      const canWrite = tasks.includes("MANAGE") || tasks.includes("ADVERTISE");
+      l.push(
+        `   • ${acct.page}: ${tasks.join(", ") || "(none)"} ${canWrite ? "✅" : "❌ read-only"}`
+      );
+    } catch (err) {
+      l.push(`   • ${acct.page}: ❌ ${String(err)}`);
+    }
+  }
+
+  l.push("");
+  l.push("Pausing needs <b>MANAGE</b> or <b>ADVERTISE</b> on the account.");
+  l.push(
+    "If ads_management is ✅ but an account says read-only, the fix is the asset assignment in Business Settings — not the token."
+  );
   return l.join("\n");
 }
 

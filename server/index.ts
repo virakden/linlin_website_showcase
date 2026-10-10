@@ -3,7 +3,15 @@ import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import multer from "multer";
-import { startAdsReportScheduler, handleAdsReportRequest, pingAdsGroup, sendAdsReport, sendAdsIssues, handleGoToFix } from "./adsReport";
+import {
+  startAdsReportScheduler,
+  handleAdsReportRequest,
+  pingAdsGroup,
+  sendAdsReport,
+  sendAdsIssues,
+  handleGoToFix,
+  handleWhoAmI,
+} from "./adsReport";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -701,7 +709,11 @@ async function processBotUpdate(update: any) {
     // Undefined in a private chat or in General, which is what we want.
     const threadId = message.message_thread_id as number | undefined;
     const replyHere = (t: string) =>
-      sendTelegramMessage(chatId, t, threadId ? { message_thread_id: threadId } : {});
+      sendTelegramMessage(
+        chatId,
+        t,
+        threadId ? { message_thread_id: threadId } : {}
+      );
     const firstName = message.from?.first_name || "";
 
     if (text === "/start" || text.startsWith("/start ")) {
@@ -715,7 +727,10 @@ async function processBotUpdate(update: any) {
     } else if (text.startsWith("/report")) {
       // /report | /report cycle | /report monthly
       // Also matches /report@botname, which is how groups deliver commands.
-      const arg = text.replace(/^\/report(@\S+)?/, "").trim().toLowerCase();
+      const arg = text
+        .replace(/^\/report(@\S+)?/, "")
+        .trim()
+        .toLowerCase();
       const period =
         arg === "cycle" || arg === "week" || arg === "weekly"
           ? "cycle"
@@ -733,14 +748,30 @@ async function processBotUpdate(update: any) {
       }
     } else if (text.startsWith("/gotofix")) {
       // /gotofix lists what would change; /gotofix yes applies it.
-      const arg = text.replace(/^\/gotofix(@\S+)?/, "").trim().toLowerCase();
+      const arg = text
+        .replace(/^\/gotofix(@\S+)?/, "")
+        .trim()
+        .toLowerCase();
       const confirmed = arg === "yes" || arg === "y" || arg === "ok";
       try {
         const reply = await handleGoToFix(confirmed);
         await replyHere(reply);
       } catch (err) {
         console.error("❌ /gotofix failed:", err);
-        await replyHere("❌ Could not apply the fixes. Check the Railway logs.");
+        await replyHere(
+          "❌ Could not apply the fixes. Check the Railway logs."
+        );
+      }
+    } else if (text.startsWith("/whoami")) {
+      // Reports what the live Meta token is and is allowed to do.
+      try {
+        const reply = await handleWhoAmI();
+        await replyHere(reply);
+      } catch (err) {
+        console.error("❌ /whoami failed:", err);
+        await replyHere(
+          "❌ Could not check the token. Check the Railway logs."
+        );
       }
     }
   } catch (error) {
